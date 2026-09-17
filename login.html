@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk & Pendaftaran Akun - SummitGuard SIMAKSI</title>
+  <meta name="description" content="Masuk ke portal SummitGuard SIMAKSI & Mitigasi Risiko Cuaca BMKG. Akses e-tiket pendakian, booking kuota, dan pemantauan badai.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Background Ambient Atmosphere & Forest Gradient -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-950 opacity-95"></div>
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-emerald-700/20 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Top Header Navigation -->
+  <header class="relative z-10 w-full border-b border-emerald-800/40 bg-slate-950/40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-700 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-900/40 group-hover:scale-105 transition-transform duration-200">
+          <!-- Mountain SVG Icon -->
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 20h18L15 6l-4 7-3-4-5 11z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-white text-lg tracking-tight">SummitGuard</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-800/80 text-emerald-200 border border-emerald-600/40">SIMAKSI</span>
+          </div>
+          <p class="text-[11px] text-emerald-300/80 font-medium">SIMAKSI & Mitigasi BMKG</p>
+        </div>
+      </a>
+
+      <a href="index.html" class="inline-flex items-center gap-2 text-xs font-semibold text-emerald-300 hover:text-emerald-100 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-800/30 border border-emerald-700/30">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="relative z-10 flex-grow flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md">
+
+      <!-- Login / Register Card Box -->
+      <div class="bg-slate-900/85 border border-emerald-700/40 rounded-2xl shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-300">
+        
+        <!-- Brand Header within Card -->
+        <div class="p-6 sm:p-8 pb-4 text-center border-b border-emerald-800/30">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-800/60 border border-emerald-600/40 text-emerald-300 mb-3 shadow-inner">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 20h18L15 6l-4 7-3-4-5 11z"/>
+            </svg>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">SummitGuard</h1>
+          <p class="text-xs text-emerald-300/90 mt-1 font-medium">Portal Resmi SIMAKSI & Mitigasi BMKG</p>
+        </div>
+
+        <!-- Tab Switcher Navigation -->
+        <div class="px-6 sm:px-8 pt-4">
+          <div class="grid grid-cols-2 p-1 bg-slate-950/70 border border-emerald-900/60 rounded-xl text-xs font-bold text-center">
+            <button
+              id="tab-signin"
+              type="button"
+              class="py-2.5 px-3 rounded-lg transition-all duration-200 bg-emerald-600 text-white shadow-md cursor-pointer"
+            >
+              Masuk (Sign In)
+            </button>
+            <button
+              id="tab-signup"
+              type="button"
+              class="py-2.5 px-3 rounded-lg transition-all duration-200 text-emerald-300/80 hover:text-white cursor-pointer"
+            >
+              Daftar Akun (Sign Up)
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert Container for Status, Errors, and Feedback Messages -->
+        <div class="px-6 sm:px-8 pt-4">
+          <div
+            id="auth-alert"
+            role="alert"
+            class="hidden p-3.5 rounded-xl text-xs border leading-relaxed flex items-start gap-2.5"
+          >
+            <!-- Injected by js/login.js -->
+          </div>
+        </div>
+
+        <!-- Forms Container -->
+        <div class="p-6 sm:p-8 pt-4">
+          
+          <!-- Sign In Form -->
+          <form id="form-signin" class="space-y-4" novalidate>
+            <div>
+              <label for="login-email" class="block text-xs font-semibold text-emerald-200/90 mb-1.5">
+                Alamat Email
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206"/>
+                  </svg>
+                </span>
+                <input
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  required
+                  autocomplete="email"
+                  placeholder="pendaki@summitguard.id"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="login-password" class="block text-xs font-semibold text-emerald-200/90">
+                  Kata Sandi
+                </label>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  required
+                  autocomplete="current-password"
+                  placeholder="••••••••"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              id="login-submit-btn"
+              class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-950/60 hover:shadow-emerald-600/30 transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Masuk ke Sistem</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </button>
+          </form>
+
+          <!-- Sign Up Form (Initially Hidden) -->
+          <form id="form-signup" class="space-y-3.5 hidden" novalidate>
+            <div>
+              <label for="register-fullname" class="block text-xs font-semibold text-emerald-200/90 mb-1.5">
+                Nama Lengkap (Sesuai KTP/Identitas)
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  id="register-fullname"
+                  name="fullname"
+                  required
+                  autocomplete="name"
+                  placeholder="Rian Mahendra"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <div>
+              <label for="register-email" class="block text-xs font-semibold text-emerald-200/90 mb-1.5">
+                Alamat Email Aktif
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206"/>
+                  </svg>
+                </span>
+                <input
+                  type="email"
+                  id="register-email"
+                  name="email"
+                  required
+                  autocomplete="email"
+                  placeholder="nama@email.com"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <div>
+              <label for="register-password" class="block text-xs font-semibold text-emerald-200/90 mb-1.5">
+                Kata Sandi Baru (Min. 6 Karakter)
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="register-password"
+                  name="password"
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                  placeholder="Minimal 6 karakter"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <div>
+              <label for="register-confirm-password" class="block text-xs font-semibold text-emerald-200/90 mb-1.5">
+                Konfirmasi Kata Sandi
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="register-confirm-password"
+                  name="confirm_password"
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                  placeholder="Ulangi kata sandi di atas"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-950/80 border border-emerald-800/60 rounded-xl text-xs text-white placeholder-emerald-700/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                >
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              id="register-submit-btn"
+              class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-950/60 hover:shadow-emerald-600/30 transition transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Daftar Akun Baru</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="relative my-5">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-emerald-900/60"></div>
+            </div>
+            <div class="relative flex justify-center text-xs">
+              <span class="px-3 bg-slate-900 text-emerald-400/60 text-[11px] font-medium uppercase tracking-wider">
+                atau opsi lain
+              </span>
+            </div>
+          </div>
+
+          <!-- Official Google OAuth Button -->
+          <button
+            type="button"
+            id="google-login-btn"
+            class="w-full py-2.5 px-4 bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-800 font-semibold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-3 cursor-pointer border border-slate-300 hover:border-slate-400"
+          >
+            <!-- Google Multicolor Icon -->
+            <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Lanjutkan dengan Google</span>
+          </button>
+
+        </div>
+
+        <!-- Card Security & Compliance Footer -->
+        <div class="px-6 py-3.5 bg-slate-950/60 border-t border-emerald-900/40 text-center">
+          <p class="text-[10px] text-emerald-400/60 font-medium leading-relaxed">
+            Data identitas pendaki dienkripsi untuk verifikasi SIMAKSI & mitigasi keselamatan cuaca BMKG.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JavaScript Libraries & Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
