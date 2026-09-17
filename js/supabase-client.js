@@ -18,15 +18,22 @@
 
   // In-memory storage fallback for environments without localStorage
   const _memoryStore = {};
+  let _storageAvailableCached = null;
 
   function _isStorageAvailable() {
+    if (_storageAvailableCached !== null) return _storageAvailableCached;
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return false;
+      if (typeof window === 'undefined' || !window.localStorage) {
+        _storageAvailableCached = false;
+        return false;
+      }
       const testKey = '__summit_supa_test__';
       window.localStorage.setItem(testKey, testKey);
       window.localStorage.removeItem(testKey);
+      _storageAvailableCached = true;
       return true;
     } catch (e) {
+      _storageAvailableCached = false;
       return false;
     }
   }
@@ -350,9 +357,6 @@
             }
           }
 
-          // Daftarkan juga ke akun lokal untuk fallback redundan
-          _localRegister(email, password, metadata);
-
           return { data, error: null };
         } catch (err) {
           console.warn('Supabase signUp gagal, beralih ke fallback akun lokal:', err);
@@ -407,8 +411,9 @@
 
     /**
      * Masuk ke sistem menggunakan Google OAuth
+     * @param {string} [targetPath] - Jalur redirect tujuan setelah OAuth, default '/index.html'
      */
-    loginWithGoogle: async function () {
+    loginWithGoogle: async function (targetPath) {
       const client = this.getSupabase();
       if (!client || !client.auth) {
         return {
@@ -420,11 +425,13 @@
       }
 
       try {
-        let redirectTarget = '/index.html';
+        const dest = (targetPath && typeof targetPath === 'string') ? targetPath : '/index.html';
+        const cleanDest = dest.startsWith('/') ? dest : '/' + dest;
+        let redirectTarget = cleanDest;
         if (typeof window !== 'undefined' && window.location) {
           const pathname = window.location.pathname || '';
           const dir = pathname.substring(0, pathname.lastIndexOf('/'));
-          redirectTarget = window.location.origin + (dir ? dir : '') + '/index.html';
+          redirectTarget = window.location.origin + (dir ? dir : '') + cleanDest;
         }
 
         const { data, error } = await client.auth.signInWithOAuth({

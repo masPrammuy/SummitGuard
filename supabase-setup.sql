@@ -28,7 +28,8 @@ begin
     coalesce(
       new.raw_user_meta_data->>'full_name',
       new.raw_user_meta_data->>'name',
-      split_part(new.email, '@', 1)
+      split_part(new.email, '@', 1),
+      'Pendaki'
     ),
     coalesce(new.raw_user_meta_data->>'role', 'Pendaki'),
     new.email,
@@ -44,7 +45,7 @@ begin
     avatar_url = coalesce(excluded.avatar_url, public.profiles.avatar_url);
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public, auth;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -122,16 +123,17 @@ create policy "Mountains insertable" on public.mountains
 
 -- Policies: BOOKINGS
 drop policy if exists "Bookings viewable by authenticated users or booking owner" on public.bookings;
-create policy "Bookings viewable by authenticated users or booking owner" on public.bookings
-  for select using (true);
+drop policy if exists "Users can view own bookings" on public.bookings;
+create policy "Users can view own bookings" on public.bookings
+  for select to authenticated using (auth.uid() = user_id);
 
-drop policy if exists "Users can insert bookings" on public.bookings;
-create policy "Users can insert bookings" on public.bookings
-  for insert with check (true);
+drop policy if exists "Users can update own bookings" on public.bookings;
+create policy "Users can update own bookings" on public.bookings
+  for update to authenticated using (auth.uid() = user_id);
 
-drop policy if exists "Users can update bookings" on public.bookings;
-create policy "Users can update bookings" on public.bookings
-  for update using (true);
+drop policy if exists "Users can insert own bookings" on public.bookings;
+create policy "Users can insert own bookings" on public.bookings
+  for insert to authenticated with check (auth.uid() = user_id or user_id is null);
 
 -- 7. INITIAL SEED DATA FOR MOUNTAINS
 insert into public.mountains (id, name, elevation, province, basecamps, daily_quota, remaining_quota, ticket_price, weather, updated_at)

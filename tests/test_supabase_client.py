@@ -39,6 +39,9 @@ class TestSupabaseClient(unittest.TestCase):
         self.assertIn("handle_new_user", sql, "handle_new_user function must be declared")
         self.assertIn("on_auth_user_created", sql, "on_auth_user_created trigger must be declared")
         self.assertIn("auth.users", sql)
+        # Review hardening checks
+        self.assertIn("set search_path = public, auth", sql, "handle_new_user must enforce search_path")
+        self.assertIn("'Pendaki'", sql, "handle_new_user must provide Pendaki fallback for full_name")
 
     def test_sql_mountains_schema(self):
         """Verify mountains table schema with quota, weather, and basecamps."""
@@ -95,6 +98,13 @@ class TestSupabaseClient(unittest.TestCase):
         self.assertRegex(sql, r"alter\s+table\s+(public\.)?bookings\s+enable\s+row\s+level\s+security", "RLS must be enabled on bookings")
         self.assertIn("create policy", sql.lower(), "Security policies must be defined")
 
+        # Hardened bookings RLS policies
+        self.assertIn("Users can view own bookings", sql)
+        self.assertIn("Users can update own bookings", sql)
+        self.assertIn("Users can insert own bookings", sql)
+        self.assertIn("to authenticated", sql)
+        self.assertIn("auth.uid() = user_id", sql)
+
     def test_sql_initial_seed_mountains(self):
         """Verify initial seed data for Merbabu, Prau, and Gede."""
         if not os.path.exists(self.sql_path):
@@ -149,6 +159,36 @@ class TestSupabaseClient(unittest.TestCase):
         self.assertIn("signUp", js)
         self.assertIn("signInWithPassword", js)
         self.assertIn("signOut", js)
+
+    def test_js_client_no_clobber_on_successful_signup(self):
+        """Verify register() does not clobber valid Supabase signup with local fallback."""
+        with open(self.js_path, "r", encoding="utf-8") as f:
+            js = f.read()
+
+        # Extract register method content
+        reg_match = re.search(r"register:\s*async\s*function\s*\([^\)]*\)\s*\{(.*?)\n\s*login:", js, re.DOTALL)
+        self.assertIsNotNone(reg_match, "register method should be present")
+        reg_body = reg_match.group(1)
+
+        # In the try block before catch, _localRegister should not be called
+        try_match = re.search(r"try\s*\{(.*?)\}\s*catch", reg_body, re.DOTALL)
+        self.assertIsNotNone(try_match, "try-catch block should be present in register")
+        try_body = try_match.group(1)
+        self.assertNotIn("_localRegister", try_body, "_localRegister must not be called inside successful try block")
+
+    def test_js_client_google_oauth_target_path(self):
+        """Verify loginWithGoogle accepts targetPath parameter."""
+        with open(self.js_path, "r", encoding="utf-8") as f:
+            js = f.read()
+
+        self.assertRegex(js, r"loginWithGoogle:\s*async\s*function\s*\(\s*targetPath\s*\)")
+
+    def test_js_client_storage_check_cached(self):
+        """Verify storage availability check is cached."""
+        with open(self.js_path, "r", encoding="utf-8") as f:
+            js = f.read()
+
+        self.assertIn("_storageAvailableCached", js)
 
 if __name__ == '__main__':
     unittest.main()
