@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SummitGuard - Panel Simulasi BMKG & Manajemen Operasional Basecamp</title>
+  <meta name="description" content="Panel pengontrol simulasi cuaca BMKG dan manajemen operasional tiket pendakian SIMAKSI untuk pengujian mitigasi risiko bencana dan demonstrasi sidang skripsi.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Navigation Bar Container (Injected by js/navbar.js) -->
+  <div id="navbar-container"></div>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow py-6 sm:py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+      <!-- Academic & Demonstration Header Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-emerald-800/60 relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-12 -bottom-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div class="space-y-2">
+            <!-- Academic Badge -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold uppercase tracking-wider">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>Panel Simulasi BMKG & Manajemen Operasional Basecamp</span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <span>Panel Kontrol Simulasi BMKG</span>
+              <span class="text-xs sm:text-sm font-mono px-2.5 py-0.5 rounded bg-emerald-800/80 text-emerald-200 border border-emerald-700">v2.0 DEMO</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-300 max-w-3xl leading-relaxed">
+              Dashboard demonstrasi interaktif pengujian sistem mitigasi dini. Dosen penguji dan operator basecamp dapat mensimulasikan peringatan cuaca buruk BMKG secara instan untuk menguji sinkronisasi otomatis terhadap status e-tiket pendaki serta 3 alur mitigasi risiko.
+            </p>
+          </div>
+
+          <!-- Quick Actions & Reset Demo Data Bar -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+            <button 
+              type="button" 
+              id="btn-reset-demo" 
+              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-md transition transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-rose-400"
+              title="Kembalikan seluruh data reservasi dan cuaca ke kondisi awal demonstrasi"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Reset Data Demo</span>
+            </button>
+
+            <a 
+              href="ticket.html?id=SMK-20260920-0482" 
+              target="_blank"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              title="Buka tiket uji standar Andi Pratama di tab baru"
+            >
+              <span>Buka Tiket Uji (Andi P.)</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: BMKG Weather Simulator per Mountain -->
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-emerald-600">⚡</span>
+              <span>Simulator Status Cuaca BMKG Real-Time</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600">
+              Ubah status cuaca gunung untuk melihat reaksi reaktif sinkronisasi status tiket pendaki.
+            </p>
+          </div>
+          <div class="text-xs text-slate-500 flex items-center gap-2 font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>Sensor IoT BMKG Aktif</span>
+          </div>
+        </div>
+
+        <!-- Weather Simulator Cards Container -->
+        <div id="weather-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Dynamically populated by js/admin.js -->
+        </div>
+      </section>
+
+      <!-- Section 2: Live Booking & Mitigation Monitor Table -->
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-blue-600">📋</span>
+              <span>Monitoring Reservasi SIMAKSI & Status Mitigasi</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600">
+              Daftar seluruh tiket aktif yang tersimpan di LocalStorage beserta status mitigasi terkininya.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span id="booking-count-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              Total: 0 Tiket
+            </span>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div id="bookings-table-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                  <th scope="col" class="py-3.5 px-4">ID Booking</th>
+                  <th scope="col" class="py-3.5 px-4">Gunung & Jalur</th>
+                  <th scope="col" class="py-3.5 px-4">Tgl Pendakian</th>
+                  <th scope="col" class="py-3.5 px-4">Ketua & Anggota</th>
+                  <th scope="col" class="py-3.5 px-4">Total Biaya</th>
+                  <th scope="col" class="py-3.5 px-4 text-center">Status Mitigasi</th>
+                  <th scope="col" class="py-3.5 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table-body" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Dynamically populated by js/admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Examiner & Jury Demonstration Scenario Guide -->
+      <section class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg">
+            📖
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Panduan Skenario Pengujian untuk Dosen Penguji</h3>
+            <p class="text-xs text-slate-500">Langkah-langkah terstruktur untuk menguji seluruh fitur sistem mitigasi bencana SIMAKSI.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Skenario 1</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-bold">Cuaca Buruk</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Ubah cuaca <strong>Gunung Merbabu</strong> menjadi <strong>"Badai Ekstrem"</strong> di panel atas. Tiket Andi Pratama otomatis berubah status menjadi <span class="text-amber-700 font-semibold font-mono">WEATHER_WARNING</span>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-700 uppercase tracking-wider">Skenario 2</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-mono font-bold">Opsi 1: Naik</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Buka e-tiket, klik <strong>"Tetap Naik dengan Surat Pernyataan"</strong>, centang 4 klausul keselamatan, isi tanda tangan NIK. Status tiket berubah menjadi <span class="text-purple-700 font-semibold font-mono">HIGH_RISK_APPROVED</span>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">Skenario 3</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono font-bold">Opsi 2: Tunda</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Uji tombol <strong>"Reschedule Bebas Biaya"</strong>, pilih tanggal pendakian pengganti. Tanggal tiket langsung diperbarui dan status berubah menjadi <span class="text-blue-700 font-semibold font-mono">RESCHEDULED</span>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-rose-700 uppercase tracking-wider">Skenario 4</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-mono font-bold">Opsi 3: Refund</span>
+            </div>
+            <p class="text-xs text-slate-600">
+              Uji tombol <strong>"Batalkan & Refund 100%"</strong>, lengkapi no rekening bank. Kuota dikembalikan ke basecamp, voucher diterbitkan, status tiket menjadi <span class="text-rose-700 font-semibold font-mono">CANCELLED_REFUNDED</span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
+          <span>Tekan tombol <strong>"Reset Data Demo"</strong> di pojok kanan atas untuk memulai kembali siklus demonstrasi dari awal.</span>
+          <span class="font-mono text-[11px] text-emerald-700 font-semibold">Demo ID: SMK-20260920-0482</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Toast Feedback Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- Footer Container (Injected by js/navbar.js) -->
+  <div id="footer-container"></div>
+
+  <!-- JavaScript Modules & Business Logic -->
+  <script src="js/store.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
