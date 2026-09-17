@@ -87,10 +87,30 @@ class TestSummitStoreContract(unittest.TestCase):
             "js/store.js must include in-memory fallback for environments without localStorage"
         )
 
+    def test_no_mojibake_in_store(self):
+        with open("js/store.js", "rb") as f:
+            raw_bytes = f.read()
+        self.assertNotIn(b"\xc3\x82\xc2\xb0", raw_bytes, "Found double-encoded mojibake Â°")
+        self.assertNotIn("Â°", self.content, "Mojibake 'Â°' found in js/store.js")
+        self.assertIn("8°C", self.content)
+        self.assertIn("14°C", self.content)
+        self.assertIn("11°C", self.content)
+
+    def test_create_booking_integer_coercion_and_refund_guard(self):
+        # Must parse membersCount as integer
+        self.assertIn("parseInt(bookingData.membersCount", self.content, "createBooking must parseInt membersCount")
+        # Must use Number() or numeric conversion on quota restoration
+        self.assertTrue(
+            "Number(booking.membersCount)" in self.content or "parseInt(booking.membersCount" in self.content,
+            "executeRefund must ensure numeric addition on remainingQuota"
+        )
+        # Must have CANCELLED_REFUNDED guards in refund and reschedule
+        self.assertIn("Tiket ini sudah dibatalkan", self.content, "executeRefund must guard against double refund")
+        self.assertIn("Tiket yang sudah dibatalkan tidak dapat dijadwalkan ulang", self.content, "executeReschedule must guard against rescheduling cancelled booking")
+
     def test_store_js_bracket_integrity(self):
         # Verify basic syntax balance of braces, brackets, and parentheses
         content = self.content
-        # Strip string literals and single/multi-line comments for a safe balance check
         cleaned = []
         i = 0
         n = len(content)

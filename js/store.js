@@ -314,8 +314,8 @@
       const randomPart = Math.floor(1000 + Math.random() * 9000).toString();
       const generatedId = `SMK-${datePart}-${randomPart}`;
 
-      const membersCount = bookingData.membersCount ||
-        (bookingData.members ? bookingData.members.length + 1 : 1);
+      const membersCount = parseInt(bookingData.membersCount, 10) ||
+        (bookingData.members && bookingData.members.length ? bookingData.members.length + 1 : 1);
 
       const hasPorter = Boolean(bookingData.addons && bookingData.addons.porterLocal);
       const porterFee = hasPorter ? (bookingData.addons.porterFee || 350000) : 0;
@@ -429,6 +429,9 @@
       }
 
       const booking = bookings[index];
+      if (booking.status === 'CANCELLED_REFUNDED') {
+        return { success: false, message: 'Tiket yang sudah dibatalkan tidak dapat diaktifkan kembali.', booking: booking };
+      }
       booking.status = 'HIGH_RISK_APPROVED';
       booking.mitigationChoice = 'PROCEED_HIGH_RISK';
       booking.highRiskWaiverSigned = true;
@@ -462,6 +465,9 @@
       }
 
       const booking = bookings[index];
+      if (booking.status === 'CANCELLED_REFUNDED') {
+        return { success: false, message: 'Tiket yang sudah dibatalkan tidak dapat dijadwalkan ulang.', booking: booking };
+      }
       booking.rescheduledFrom = booking.climbDate;
       booking.climbDate = newDate;
       booking.status = 'RESCHEDULED';
@@ -487,6 +493,10 @@
       }
 
       const booking = bookings[index];
+      if (booking.status === 'CANCELLED_REFUNDED') {
+        return { success: false, message: 'Tiket ini sudah dibatalkan & direfund.', booking: booking };
+      }
+
       const today = new Date();
       const datePart = today.getFullYear().toString() +
         String(today.getMonth() + 1).padStart(2, '0') +
@@ -512,11 +522,12 @@
       if (mIndex !== -1) {
         mountains[mIndex].remainingQuota = Math.min(
           mountains[mIndex].dailyQuota,
-          mountains[mIndex].remainingQuota + (booking.membersCount || 1)
+          mountains[mIndex].remainingQuota + (Number(booking.membersCount) || 1)
         );
         this.saveMountains(mountains);
       }
 
+      booking.success = true;
       this.saveBookings(bookings);
       return booking;
     },
