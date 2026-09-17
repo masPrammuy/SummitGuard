@@ -46,6 +46,17 @@
     }
   }
 
+  // Sanitize user inputs before inserting into HTML
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#039;');
+  }
+
   // Fallback store access
   function getStore() {
     if (typeof window !== 'undefined' && window.SummitStore) {
@@ -319,13 +330,14 @@
         const activeClass = isActive
           ? 'bg-emerald-600 text-white font-bold'
           : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
+        const displayMtn = b.mountainName ? b.mountainName.replace('Gunung ', '') : 'Gunung';
         html += `
           <button 
             type="button" 
             class="booking-chip-btn px-2.5 py-1 rounded text-[11px] font-mono transition ${activeClass}" 
-            data-id="${b.bookingId}"
+            data-id="${escapeHtml(b.bookingId)}"
           >
-            ${b.bookingId} (${b.mountainName ? b.mountainName.replace('Gunung ', '') : 'Gunung'})
+            ${escapeHtml(b.bookingId)} (${escapeHtml(displayMtn)})
           </button>
         `;
       });
@@ -406,14 +418,14 @@
           b.members.forEach((m, idx) => {
             rosterHtml += `
               <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">
-                    ${idx + 2}
-                  </span>
-                  <strong class="text-slate-800">${m.name}</strong>
-                </div>
-                <span class="font-mono text-slate-500 text-[11px]">NIK: ${m.nik}</span>
-              </div>
+                 <div class="flex items-center gap-2">
+                   <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">
+                     ${idx + 2}
+                   </span>
+                   <strong class="text-slate-800">${escapeHtml(m.name)}</strong>
+                 </div>
+                 <span class="font-mono text-slate-500 text-[11px]">NIK: ${escapeHtml(m.nik)}</span>
+               </div>
             `;
           });
           this.dom.membersList.innerHTML = rosterHtml;
@@ -598,6 +610,9 @@
 
       if (b.status === 'HIGH_RISK_APPROVED') {
         const waiver = b.waiverDetails || {};
+        const signer = waiver.signerName || (b.leader && b.leader.name);
+        const nik = waiver.signerNik || (b.leader && b.leader.nik);
+        const hotline = waiver.emergencyHotline || '0811-2345-SAR';
         bannerHtml = `
           <div class="bg-amber-50 border-2 border-amber-400 rounded-xl p-4 sm:p-5 shadow-sm space-y-2">
             <div class="flex items-start gap-3">
@@ -607,10 +622,10 @@
                   Perhatian: Anda Melakukan Pendakian Kategori Risiko Tinggi (High-Risk Ascent)
                 </h4>
                 <p class="text-xs text-amber-900 mt-1 leading-relaxed">
-                  Surat pelepasan tanggung jawab telah ditandatangani oleh <strong>${waiver.signerName || (b.leader && b.leader.name)}</strong> (NIK: ${waiver.signerNik || (b.leader && b.leader.nik)}). Seluruh rombongan wajib melapor ke Pos 1 Basecamp untuk pemeriksaan fisik tenda badai sebelum melangkah ke pos atas.
+                  Surat pelepasan tanggung jawab telah ditandatangani oleh <strong>${escapeHtml(signer)}</strong> (NIK: ${escapeHtml(nik)}). Seluruh rombongan wajib melapor ke Pos 1 Basecamp untuk pemeriksaan fisik tenda badai sebelum melangkah ke pos atas.
                 </p>
                 <div class="mt-2.5 pt-2 border-t border-amber-300 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-amber-950">
-                  <span>🚨 Posko Ranger SAR Basecamp: <strong class="font-mono text-red-700">${waiver.emergencyHotline || '0811-2345-SAR'}</strong></span>
+                  <span>🚨 Posko Ranger SAR Basecamp: <strong class="font-mono text-red-700">${escapeHtml(hotline)}</strong></span>
                   <span class="text-[11px] text-amber-800">Waktu TTD: ${waiver.signedAt ? new Date(waiver.signedAt).toLocaleDateString('id-ID') : 'Tervalidasi'}</span>
                 </div>
               </div>
@@ -629,7 +644,7 @@
                   Jadwal Pendakian Berhasil Diperbarui (Bebas Denda / Rp 0)
                 </h4>
                 <p class="text-xs text-blue-900 mt-1 leading-relaxed">
-                  Jadwal pendakian telah dipindahkan dari tanggal semula <strong>${formatDateIndo(b.rescheduledFrom)}</strong> ke tanggal baru yang aman: <strong>${formatDateIndo(b.climbDate)}</strong>. Kuota rombongan dan QR Code verifikasi telah diperbarui secara otomatis.
+                  Jadwal pendakian telah dipindahkan dari tanggal semula <strong>${escapeHtml(formatDateIndo(b.rescheduledFrom))}</strong> ke tanggal baru yang aman: <strong>${escapeHtml(formatDateIndo(b.climbDate))}</strong>. Kuota rombongan dan QR Code verifikasi telah diperbarui secara otomatis.
                 </p>
                 <div class="mt-2 text-xs text-blue-800 font-medium">
                   Status: Kuota Terkonfirmasi • Bebas Biaya Penalti
@@ -642,6 +657,10 @@
         this.dom.postMitigationBanner.classList.remove('hidden');
       } else if (b.status === 'CANCELLED_REFUNDED') {
         const refund = b.refundDetails || {};
+        const voucher = refund.voucherCode || 'REF-COMPLETED';
+        const bank = refund.bankName || 'TRANSFER_BANK';
+        const accNum = refund.accountNumber || '-';
+        const accHolder = refund.accountHolder || (b.leader && b.leader.name);
         bannerHtml = `
           <div class="bg-slate-100 border-2 border-slate-300 rounded-xl p-4 sm:p-5 shadow-sm space-y-2">
             <div class="flex items-start gap-3">
@@ -652,7 +671,7 @@
                     Kuitansi Digital Pengembalian Dana 100% Penuh (Force Majeure)
                   </h4>
                   <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-200 text-slate-800 border border-slate-300">
-                    ${refund.voucherCode || 'REF-COMPLETED'}
+                    ${escapeHtml(voucher)}
                   </span>
                 </div>
                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">
@@ -661,15 +680,15 @@
                 <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 bg-white p-2.5 rounded-lg border border-slate-200 text-[11px]">
                   <div>
                     <span class="text-slate-400 block">Bank / E-Wallet:</span>
-                    <strong class="text-slate-800">${refund.bankName || 'TRANSFER_BANK'}</strong>
+                    <strong class="text-slate-800">${escapeHtml(bank)}</strong>
                   </div>
                   <div>
                     <span class="text-slate-400 block">Nomor Rekening:</span>
-                    <strong class="text-slate-800 font-mono">${refund.accountNumber || '-'}</strong>
+                    <strong class="text-slate-800 font-mono">${escapeHtml(accNum)}</strong>
                   </div>
                   <div>
                     <span class="text-slate-400 block">Pemilik Rekening:</span>
-                    <strong class="text-slate-800">${refund.accountHolder || (b.leader && b.leader.name)}</strong>
+                    <strong class="text-slate-800">${escapeHtml(accHolder)}</strong>
                   </div>
                 </div>
               </div>
@@ -821,6 +840,17 @@
         }
       });
 
+      // Close any open modal on Escape key press
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          [this.dom.modalHighRisk, this.dom.modalReschedule, this.dom.modalRefund].forEach(modal => {
+            if (modal && !modal.classList.contains('hidden')) {
+              this.closeModal(modal);
+            }
+          });
+        }
+      });
+
       // 9. Modal Form Submissions
       // Modal 1 Form: Tetap Naik
       if (this.dom.formHighRisk) {
@@ -915,6 +945,10 @@
 
       try {
         const updated = this.store.executeProceedHighRisk(this.currentBookingId, waiverData);
+        if (updated && updated.success === false) {
+          alert(updated.message);
+          return;
+        }
         this.currentBooking = updated;
         this.closeModal(this.dom.modalHighRisk);
         this.showToast('Pakta Integritas Berhasil Disetujui!', 'Status tiket diperbarui menjadi Tetap Naik (High Risk). Harap lapor pos basecamp saat tiba.', 'warning');
@@ -1004,6 +1038,10 @@
 
       try {
         const updated = this.store.executeReschedule(this.currentBookingId, newDate);
+        if (updated && updated.success === false) {
+          alert(updated.message);
+          return;
+        }
         this.currentBooking = updated;
         this.closeModal(this.dom.modalReschedule);
         this.showToast('Jadwal Berhasil Diperbarui (Rp 0)!', `Tanggal pendakian telah dipindahkan ke ${formatDateIndo(newDate)}. QR Code baru telah diterbitkan.`, 'info');
@@ -1058,6 +1096,10 @@
 
       try {
         const updated = this.store.executeRefund(this.currentBookingId, refundData);
+        if (updated && updated.success === false) {
+          alert(updated.message);
+          return;
+        }
         this.currentBooking = updated;
         this.closeModal(this.dom.modalRefund);
         this.showToast('Klaim Refund 100% Berhasil!', `Pengembalian dana 100% sebesar ${formatRupiah(updated.totalPayment)} diproses. Voucher kuitansi telah terbit.`, 'success');
@@ -1085,6 +1127,7 @@
     TicketController: TicketController,
     formatRupiah: formatRupiah,
     formatDateIndo: formatDateIndo,
-    generateQRCodeSVG: generateQRCodeSVG
+    generateQRCodeSVG: generateQRCodeSVG,
+    escapeHtml: escapeHtml
   };
 }));

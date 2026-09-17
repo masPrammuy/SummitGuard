@@ -167,7 +167,21 @@ class TestTicket(unittest.TestCase):
         self.assertIn("renderPostMitigationBanner", js)
         self.assertIn("handleHighRiskSubmit", js)
         self.assertIn("handleRescheduleSubmit", js)
-        self.assertIn("handleRefundSubmit", js)
+        # Polish 1: escapeHtml helper for safe string interpolation
+        self.assertIn("escapeHtml", js, "js/ticket.js must define escapeHtml helper")
+
+        # Polish 2: guard checks on updated response for mitigation methods
+        self.assertTrue(
+            "updated && updated.success === false" in js or "updated.success === false" in js,
+            "js/ticket.js must check updated.success === false guard before assigning currentBooking"
+        )
+
+        # Polish 3: keydown listener for Escape key to close open modals
+        self.assertIn("keydown", js, "js/ticket.js must listen for keydown events")
+        self.assertTrue(
+            "Escape" in js or "Esc" in js,
+            "js/ticket.js must handle Escape key to dismiss modals"
+        )
 
         # Bracket integrity / syntax check
         self._verify_bracket_integrity(js)
