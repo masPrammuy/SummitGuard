@@ -157,6 +157,24 @@ class TestBooking(unittest.TestCase):
             "js/booking.js must redirect or link to ticket.html"
         )
 
+        # Explicit interface invocation for shared navigation and footer
+        self.assertIn("renderNavbar('booking'", js, "js/booking.js must explicitly invoke renderNavbar('booking')")
+        self.assertIn("renderFooter('footer-container')", js, "js/booking.js must explicitly invoke renderFooter")
+
+        # Quota sufficiency validation
+        self.assertTrue(
+          "remainingQuota < totalMembers" in js or "remainingQuota <" in js,
+          "js/booking.js must validate quota sufficiency before checkout"
+        )
+        self.assertIn("Kuota pendakian tidak mencukupi", js, "js/booking.js must display quota insufficiency error")
+
+        # Form Enter-key submission and prevent reload
+        self.assertIn("addEventListener('submit'", js, "js/booking.js must handle form submit event")
+        self.assertIn("preventDefault()", js, "js/booking.js must prevent default on submit to avoid reload")
+
+        # Visual selection styling for payment method radios
+        self.assertIn("updatePaymentMethodVisuals", js, "js/booking.js must manage visual styling for payment methods")
+
         # Bracket integrity / syntax check
         self._verify_bracket_integrity(js)
 

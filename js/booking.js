@@ -53,6 +53,13 @@
       this.cacheDom();
       if (!this.dom.form && !this.dom.mountainSelect) return;
 
+      if (typeof renderNavbar === 'function') {
+        renderNavbar('booking', 'navbar-container');
+      }
+      if (typeof renderFooter === 'function') {
+        renderFooter('footer-container');
+      }
+
       this.loadMountains();
       this.initDateLimits();
       this.checkUrlParams();
@@ -60,6 +67,7 @@
       this.renderMountainPreview();
       this.renderMemberRows();
       this.updatePriceSummary();
+      this.updatePaymentMethodVisuals();
       this.bindEvents();
     }
 
@@ -431,6 +439,25 @@
     }
 
     /**
+     * Update visual active state for payment method cards
+     */
+    updatePaymentMethodVisuals() {
+      if (!this.dom.form) return;
+      const paymentRadios = this.dom.form.querySelectorAll('input[name="paymentMethod"]');
+      paymentRadios.forEach(radio => {
+        const card = radio.closest('label');
+        if (!card) return;
+        if (radio.checked) {
+          card.classList.add('border-2', 'border-emerald-600', 'bg-emerald-50/40');
+          card.classList.remove('border-slate-200', 'bg-white', 'hover:bg-slate-50');
+        } else {
+          card.classList.remove('border-2', 'border-emerald-600', 'bg-emerald-50/40');
+          card.classList.add('border', 'border-slate-200', 'bg-white', 'hover:bg-slate-50');
+        }
+      });
+    }
+
+    /**
      * Check all equipment checkboxes helper
      */
     checkAllEquipments() {
@@ -548,6 +575,11 @@
       const totalMembers = parseInt(this.dom.membersCount ? this.dom.membersCount.value : 1, 10);
       if (totalMembers < 2) {
         return 'Sesuai regulasi Taman Nasional, jumlah rombongan minimal 2 orang (solo hike dilarang).';
+      }
+
+      // Validate quota sufficiency
+      if (typeof mountain.remainingQuota === 'number' && mountain.remainingQuota < totalMembers) {
+        return `Kuota pendakian tidak mencukupi untuk jumlah rombongan Anda (tersisa ${mountain.remainingQuota} tiket).`;
       }
 
       const memberNames = this.dom.membersContainer.querySelectorAll('.member-name-input');
@@ -818,6 +850,22 @@
         this.dom.submitBtn.addEventListener('click', (e) => {
           e.preventDefault();
           this.submitBooking();
+        });
+      }
+
+      // Handle form enter-key submission to prevent default page reload
+      if (this.dom.form) {
+        this.dom.form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.submitBooking();
+        });
+
+        // Payment method selection visuals
+        const paymentRadios = this.dom.form.querySelectorAll('input[name="paymentMethod"]');
+        paymentRadios.forEach(radio => {
+          radio.addEventListener('change', () => {
+            this.updatePaymentMethodVisuals();
+          });
         });
       }
     }
