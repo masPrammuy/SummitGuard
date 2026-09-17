@@ -18,6 +18,32 @@
   'use strict';
 
   /**
+   * Safe HTML escaping helper to prevent XSS and attribute injection
+   * @param {*} str
+   * @returns {string}
+   */
+  function _escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#39;');
+  }
+
+  /**
+   * Validate avatar URL to strictly allow http/https protocols
+   * @param {*} url
+   * @returns {boolean}
+   */
+  function _isValidAvatarUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const trimmed = url.trim().toLowerCase();
+    return trimmed.startsWith('https://') || trimmed.startsWith('http://');
+  }
+
+  /**
    * Render the top navigation bar into #navbar-container or specified element
    * @param {string} activePage - 'home' | 'index' | 'booking' | 'ticket' | 'admin'
    * @param {HTMLElement|string} [container] - optional container ID or element
@@ -40,14 +66,18 @@
       }
     }
 
-    const displayName = (currentUser && currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
-                        (currentUser && (currentUser.name || currentUser.full_name)) ||
-                        (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Pendaki');
+    const rawDisplayName = (currentUser && currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
+                           (currentUser && (currentUser.name || currentUser.full_name)) ||
+                           (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Pendaki');
 
-    const userEmail = (currentUser && currentUser.email) || '';
-    const avatarUrl = (currentUser && currentUser.user_metadata && currentUser.user_metadata.avatar_url) ||
+    const rawEmail = (currentUser && currentUser.email) || '';
+    const rawAvatar = (currentUser && currentUser.user_metadata && currentUser.user_metadata.avatar_url) ||
                       (currentUser && currentUser.avatar_url) || null;
-    const initialLetter = (displayName || 'P').charAt(0).toUpperCase();
+
+    const displayName = _escapeHtml(rawDisplayName);
+    const userEmail = _escapeHtml(rawEmail);
+    const avatarUrl = _isValidAvatarUrl(rawAvatar) ? _escapeHtml(rawAvatar.trim()) : null;
+    const initialLetter = _escapeHtml((rawDisplayName || 'P').charAt(0).toUpperCase());
 
     const navHtml = `
     <nav class="bg-emerald-900 text-white shadow-md border-b border-emerald-800 relative z-40">

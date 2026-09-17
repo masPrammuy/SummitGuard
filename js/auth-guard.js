@@ -30,11 +30,21 @@
 
   /**
    * Check if the current location is the login page to avoid redirect loops
+   * @param {string} [customLoginUrl] - Optional custom login URL to compare against
    */
-  function _isLoginPage() {
+  function _isLoginPage(customLoginUrl) {
     if (!_isBrowser()) return false;
     const pathname = (window.location.pathname || '').toLowerCase();
-    return pathname.endsWith('login.html') || pathname.includes('/login.html') || pathname.endsWith('/login');
+    if (/(^|\/)login(\.html)?$/i.test(pathname)) {
+      return true;
+    }
+    if (customLoginUrl && typeof customLoginUrl === 'string') {
+      const cleanCustom = customLoginUrl.split('?')[0].toLowerCase();
+      if (pathname.endsWith(cleanCustom) || pathname === cleanCustom) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -49,7 +59,7 @@
     const loginUrl = options.loginUrl || 'login.html';
 
     // 1. Bypass redirect if already on login page
-    if (_isBrowser() && _isLoginPage()) {
+    if (_isBrowser() && _isLoginPage(loginUrl)) {
       let activeSession = null;
       if (typeof SummitSupabase !== 'undefined' && SummitSupabase && typeof SummitSupabase.getSession === 'function') {
         try {
@@ -154,12 +164,16 @@
   /**
    * Helper to automatically execute auth check on DOM initialization
    * @param {Object} [options]
+   * @returns {Promise<any>}
    */
   function init(options) {
     if (_isBrowser()) {
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-          checkAuthAndRedirect(options);
+        return new Promise(function (resolve) {
+          document.addEventListener('DOMContentLoaded', async function () {
+            const result = await checkAuthAndRedirect(options);
+            resolve(result);
+          });
         });
       } else {
         return checkAuthAndRedirect(options);
