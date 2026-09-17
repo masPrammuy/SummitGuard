@@ -57,6 +57,15 @@
       .split("'").join('&#039;');
   }
 
+  // Safe local date string helper avoiding UTC timezone skew
+  function getLocalDateString(d) {
+    const date = d || new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Fallback store access
   function getStore() {
     if (typeof window !== 'undefined' && window.SummitStore) {
@@ -949,7 +958,7 @@
           alert(updated.message);
           return;
         }
-        this.currentBooking = updated;
+        this.currentBooking = (updated && updated.booking) ? updated.booking : updated;
         this.closeModal(this.dom.modalHighRisk);
         this.showToast('Pakta Integritas Berhasil Disetujui!', 'Status tiket diperbarui menjadi Tetap Naik (High Risk). Harap lapor pos basecamp saat tiba.', 'warning');
         this.renderTicketDetails();
@@ -974,8 +983,8 @@
       const maxDate = new Date(baseDate);
       maxDate.setDate(maxDate.getDate() + 30);
 
-      const minStr = minDate.toISOString().split('T')[0];
-      const maxStr = maxDate.toISOString().split('T')[0];
+      const minStr = getLocalDateString(minDate);
+      const maxStr = getLocalDateString(maxDate);
 
       if (this.dom.rescheduleDateInput) {
         this.dom.rescheduleDateInput.min = minStr;
@@ -991,7 +1000,7 @@
         offsets.forEach(offset => {
           const d = new Date(baseDate);
           d.setDate(d.getDate() + offset);
-          const valStr = d.toISOString().split('T')[0];
+          const valStr = getLocalDateString(d);
           const displayStr = formatDateIndo(valStr);
 
           quickHtml += `
@@ -1042,7 +1051,7 @@
           alert(updated.message);
           return;
         }
-        this.currentBooking = updated;
+        this.currentBooking = (updated && updated.booking) ? updated.booking : updated;
         this.closeModal(this.dom.modalReschedule);
         this.showToast('Jadwal Berhasil Diperbarui (Rp 0)!', `Tanggal pendakian telah dipindahkan ke ${formatDateIndo(newDate)}. QR Code baru telah diterbitkan.`, 'info');
         this.renderTicketDetails();
@@ -1100,9 +1109,10 @@
           alert(updated.message);
           return;
         }
-        this.currentBooking = updated;
+        const booking = (updated && updated.booking) ? updated.booking : updated;
+        this.currentBooking = booking;
         this.closeModal(this.dom.modalRefund);
-        this.showToast('Klaim Refund 100% Berhasil!', `Pengembalian dana 100% sebesar ${formatRupiah(updated.totalPayment)} diproses. Voucher kuitansi telah terbit.`, 'success');
+        this.showToast('Klaim Refund 100% Berhasil!', `Pengembalian dana 100% sebesar ${formatRupiah(booking.totalPayment)} diproses. Voucher kuitansi telah terbit.`, 'success');
         this.renderTicketDetails();
         this.renderWeatherAlertSection();
         this.renderPostMitigationBanner();
@@ -1128,6 +1138,7 @@
     formatRupiah: formatRupiah,
     formatDateIndo: formatDateIndo,
     generateQRCodeSVG: generateQRCodeSVG,
-    escapeHtml: escapeHtml
+    escapeHtml: escapeHtml,
+    getLocalDateString: getLocalDateString
   };
 }));

@@ -22,6 +22,26 @@
     return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
   }
 
+  // Escape HTML entities to prevent DOM XSS
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#039;');
+  }
+
+  // Safe local date string helper avoiding UTC timezone skew
+  function getLocalDateString(d) {
+    const date = d || new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Fallback store access if needed
   function getStore() {
     if (typeof window !== 'undefined' && window.SummitStore) {
@@ -194,11 +214,11 @@
       if (!this.dom.climbDate) return;
 
       const today = new Date();
-      const minDateStr = today.toISOString().split('T')[0];
+      const minDateStr = getLocalDateString(today);
 
       const maxDate = new Date();
       maxDate.setDate(today.getDate() + 60);
-      const maxDateStr = maxDate.toISOString().split('T')[0];
+      const maxDateStr = getLocalDateString(maxDate);
 
       this.dom.climbDate.min = minDateStr;
       this.dom.climbDate.max = maxDateStr;
@@ -207,7 +227,7 @@
       if (!this.dom.climbDate.value) {
         const defaultDate = new Date();
         defaultDate.setDate(today.getDate() + 3);
-        this.dom.climbDate.value = defaultDate.toISOString().split('T')[0];
+        this.dom.climbDate.value = getLocalDateString(defaultDate);
       }
     }
 
@@ -344,13 +364,13 @@
               <label for="member-name-${i}" class="block text-[11px] font-semibold text-slate-600 mb-1">
                 Nama Lengkap (Sesuai KTP/KIA) <span class="text-red-500">*</span>
               </label>
-              <input type="text" id="member-name-${i}" class="member-name-input w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-xs focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition" placeholder="Nama Anggota #${memberNum}" value="${prevName}">
+              <input type="text" id="member-name-${i}" class="member-name-input w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-xs focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition" placeholder="Nama Anggota #${memberNum}" value="${escapeHtml(prevName)}">
             </div>
             <div>
               <label for="member-nik-${i}" class="block text-[11px] font-semibold text-slate-600 mb-1">
                 NIK KTP / No. Identitas (16 Digit) <span class="text-red-500">*</span>
               </label>
-              <input type="text" id="member-nik-${i}" maxlength="16" class="member-nik-input w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-xs font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition" placeholder="16 digit NIK Anggota #${memberNum}" value="${prevNik}">
+              <input type="text" id="member-nik-${i}" maxlength="16" class="member-nik-input w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-xs font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition" placeholder="16 digit NIK Anggota #${memberNum}" value="${escapeHtml(prevNik)}">
             </div>
           </div>
         `;
@@ -886,6 +906,8 @@
 
   return {
     BookingController: BookingController,
+    escapeHtml: escapeHtml,
+    getLocalDateString: getLocalDateString,
     getController: function () {
       return controller;
     }

@@ -183,6 +183,10 @@ class TestTicket(unittest.TestCase):
             "js/ticket.js must handle Escape key to dismiss modals"
         )
 
+        # Safe local date math helper
+        self.assertIn("getLocalDateString", js, "js/ticket.js must define getLocalDateString helper")
+        self.assertNotIn("toISOString().split('T')[0]", js, "js/ticket.js must not use toISOString().split('T')[0]")
+
         # Bracket integrity / syntax check
         self._verify_bracket_integrity(js)
 

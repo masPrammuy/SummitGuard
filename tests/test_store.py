@@ -108,6 +108,17 @@ class TestSummitStoreContract(unittest.TestCase):
         self.assertIn("Tiket ini sudah dibatalkan", self.content, "executeRefund must guard against double refund")
         self.assertIn("Tiket yang sudah dibatalkan tidak dapat dijadwalkan ulang", self.content, "executeReschedule must guard against rescheduling cancelled booking")
 
+    def test_store_local_date_and_clean_return_shapes(self):
+        # Safe local date math
+        self.assertIn("getLocalDateString", self.content, "js/store.js must define getLocalDateString helper")
+        self.assertNotIn("toISOString().split('T')[0]", self.content, "js/store.js must not use toISOString().split('T')[0]")
+
+        # No mutation of persistent booking with transient .success = true
+        self.assertNotIn("booking.success = true;", self.content, "js/store.js must not pollute booking entity with .success = true")
+
+        # Clean consistent return shape across all 3 mitigation methods
+        self.assertIn("return { success: true, booking: booking };", self.content, "js/store.js mitigation methods must return { success: true, booking: booking }")
+
     def test_store_js_bracket_integrity(self):
         # Verify basic syntax balance of braces, brackets, and parentheses
         content = self.content

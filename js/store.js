@@ -160,6 +160,15 @@
     return JSON.parse(JSON.stringify(data));
   }
 
+  // Safe local date string helper avoiding UTC timezone skew
+  function getLocalDateString(d) {
+    const date = d || new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   const SummitStore = {
     /**
      * Inisialisasi data storage jika belum ada
@@ -332,7 +341,7 @@
         mountainId: bookingData.mountainId,
         mountainName: mountainName,
         basecamp: bookingData.basecamp || (mountain && mountain.basecamps ? mountain.basecamps[0] : 'Basecamp Utama'),
-        climbDate: bookingData.climbDate || today.toISOString().split('T')[0],
+        climbDate: bookingData.climbDate || getLocalDateString(today),
         durationDays: bookingData.durationDays || 2,
         leader: bookingData.leader || {
           name: '',
@@ -445,7 +454,7 @@
       };
 
       this.saveBookings(bookings);
-      return booking;
+      return { success: true, booking: booking };
     },
 
     /**
@@ -475,7 +484,7 @@
       booking.rescheduledAt = new Date().toISOString();
 
       this.saveBookings(bookings);
-      return booking;
+      return { success: true, booking: booking };
     },
 
     /**
@@ -527,9 +536,8 @@
         this.saveMountains(mountains);
       }
 
-      booking.success = true;
       this.saveBookings(bookings);
-      return booking;
+      return { success: true, booking: booking };
     },
 
     /**
@@ -542,7 +550,9 @@
         mountains: this.getMountains(),
         bookings: this.getBookings()
       };
-    }
+    },
+
+    getLocalDateString: getLocalDateString
   };
 
   // Otomatis jalankan inisialisasi awal

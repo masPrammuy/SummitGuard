@@ -175,6 +175,15 @@ class TestBooking(unittest.TestCase):
         # Visual selection styling for payment method radios
         self.assertIn("updatePaymentMethodVisuals", js, "js/booking.js must manage visual styling for payment methods")
 
+        # Security: escapeHtml helper and sanitization in renderMemberRows against DOM XSS
+        self.assertIn("escapeHtml", js, "js/booking.js must define escapeHtml helper")
+        self.assertIn("escapeHtml(prevName)", js, "js/booking.js must escape prevName in renderMemberRows")
+        self.assertIn("escapeHtml(prevNik)", js, "js/booking.js must escape prevNik in renderMemberRows")
+
+        # Safe local date math
+        self.assertIn("getLocalDateString", js, "js/booking.js must define getLocalDateString helper")
+        self.assertNotIn("toISOString().split('T')[0]", js, "js/booking.js must not use toISOString().split('T')[0]")
+
         # Bracket integrity / syntax check
         self._verify_bracket_integrity(js)
 
