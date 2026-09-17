@@ -10,6 +10,9 @@
     module.exports = factory();
   } else {
     root.SummitNavbar = factory();
+    root.renderNavbar = root.SummitNavbar.renderNavbar;
+    root.renderFooter = root.SummitNavbar.renderFooter;
+    root.renderBMKGWeatherBanner = root.SummitNavbar.renderBMKGWeatherBanner;
   }
 }(typeof self !== 'undefined' ? self : this, function() {
   'use strict';
@@ -359,7 +362,7 @@
                 STATUS BMKG: KONDUSIF & AMAN
               </span>
               <p class="text-xs text-emerald-900 mt-0.5 font-medium">
-                ${data.mountainName ? data.mountainName + ': ' : ''}Cuaca cerah berawan, aman untuk aktivitas pendakian resmi.
+                ${data.mountainName ? data.mountainName + ': ' : ''}Cuaca ${data.condition || 'Cerah Berawan'}, aman untuk aktivitas pendakian resmi.
               </p>
             </div>
           </div>

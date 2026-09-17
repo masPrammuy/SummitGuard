@@ -67,6 +67,12 @@ class TestAssets(unittest.TestCase):
         for fn in required_functions:
             self.assertIn(fn, js, f"Function '{fn}' must be defined in js/navbar.js")
 
+        # Check global scope root exposure
+        self.assertIn("root.renderNavbar", js, "root.renderNavbar must be exposed on global root scope")
+        self.assertIn("root.renderFooter", js, "root.renderFooter must be exposed on global root scope")
+        self.assertIn("root.renderBMKGWeatherBanner", js, "root.renderBMKGWeatherBanner must be exposed on global root scope")
+
+
         # Check navigation destinations
         required_links = [
             "index.html",
