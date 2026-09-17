@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SummitGuard - Formulir Reservasi SIMAKSI Online</title>
+  <meta name="description" content="Pendaftaran SIMAKSI terpadu dengan mitigasi dini cuaca BMKG, kuota real-time, skrining kesiapsiagaan peralatan, dan jasa porter paguyuban basecamp.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- Navigation Bar Container (Injected by js/navbar.js) -->
+  <div id="navbar-container"></div>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow py-8 sm:py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Breadcrumb & Header Title -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 text-xs font-semibold text-emerald-700 mb-2">
+          <a href="index.html" class="hover:underline flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            Beranda
+          </a>
+          <span>/</span>
+          <span class="text-slate-500">Pendaftaran SIMAKSI</span>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Sistem Perizinan Konservasi Terintegrasi BMKG</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Formulir Reservasi SIMAKSI
+            </h1>
+            <p class="text-slate-600 text-sm mt-1 max-w-2xl">
+              Lengkapi registrasi izin pendakian resmi Taman Nasional. Dilengkapi sistem pantau cuaca ekstrem BMKG, kuota akurat, dan perlindungan asuransi jiwa SAR.
+            </p>
+          </div>
+
+          <!-- Quick Autofill Demo Button -->
+          <button type="button" id="btn-autofill-demo" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold border border-amber-300 transition shadow-sm self-start md:self-auto">
+            <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span>Isi Data Cepat (Demo Uji)</span>
+          </button>
+        </div>
+
+        <!-- 5-Step Process Indicator Bar -->
+        <div class="mt-6 grid grid-cols-5 gap-2 sm:gap-3 text-center">
+          <div class="bg-emerald-600 text-white rounded-lg p-2 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-wider">Langkah 1</p>
+            <p class="text-xs font-semibold truncate hidden sm:block">Gunung & Jadwal</p>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-lg p-2 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-wider">Langkah 2</p>
+            <p class="text-xs font-semibold truncate hidden sm:block">Data Rombongan</p>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-lg p-2 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-wider">Langkah 3</p>
+            <p class="text-xs font-semibold truncate hidden sm:block">Skrining SOP</p>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-lg p-2 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-wider">Langkah 4</p>
+            <p class="text-xs font-semibold truncate hidden sm:block">Porter Paguyuban</p>
+          </div>
+          <div class="bg-emerald-600 text-white rounded-lg p-2 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-wider">Langkah 5</p>
+            <p class="text-xs font-semibold truncate hidden sm:block">Checkout Tiket</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Form Container -->
+      <form id="booking-form" class="space-y-8" novalidate>
+
+        <!-- ================================================================= -->
+        <!-- STEP 1: GUNUNG & JADWAL PENDAKIAN                                -->
+        <!-- ================================================================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm">
+              1
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">
+                Pilihan Kawasan Gunung & Jadwal Pendakian
+              </h2>
+              <p class="text-xs text-slate-500">
+                Pilih destinasi gunung konservasi, pos basecamp resmi, serta tanggal kedatangan rombongan.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Pilihan Gunung -->
+            <div>
+              <label for="mountain-select" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Destinasi Gunung Konservasi <span class="text-red-500">*</span>
+              </label>
+              <select id="mountain-select" name="mountainId" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                <!-- Dynamically populated from SummitStore -->
+                <option value="merbabu">Gunung Merbabu (3.142 mdpl)</option>
+                <option value="prau">Gunung Prau (2.565 mdpl)</option>
+                <option value="gede">Gunung Gede Pangrango (2.958 mdpl)</option>
+              </select>
+              <p class="text-[11px] text-slate-500 mt-1">
+                Tarif tiket masuk PNBP diatur berdasarkan PP Kawasan Konservasi Alam.
+              </p>
+            </div>
+
+            <!-- Pilihan Pos Basecamp -->
+            <div>
+              <label for="basecamp-select" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Pos Registrasi Basecamp Resmi <span class="text-red-500">*</span>
+              </label>
+              <select id="basecamp-select" name="basecamp" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                <!-- Dynamically updated when mountain changes -->
+                <option value="Selo">Pos Selo (Boyolali)</option>
+              </select>
+              <p class="text-[11px] text-slate-500 mt-1">
+                Wajib melakukan verifikasi fisik & briefing keselamatan di basecamp ini.
+              </p>
+            </div>
+
+            <!-- Tanggal Pendakian -->
+            <div>
+              <label for="climb-date" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Tanggal Naik / Masuk Kawasan <span class="text-red-500">*</span>
+              </label>
+              <input type="date" id="climb-date" name="climbDate" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+              <p class="text-[11px] text-slate-500 mt-1">
+                Reservasi dibuka mulai hari ini s.d. 60 hari ke depan.
+              </p>
+            </div>
+
+            <!-- Durasi Pendakian -->
+            <div>
+              <label for="climb-duration" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Durasi Izin Berkemah (Hari) <span class="text-red-500">*</span>
+              </label>
+              <select id="climb-duration" name="durationDays" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                <option value="1">1 Hari (Pendakian Tik-Tok / Tanpa Berkemah)</option>
+                <option value="2" selected>2 Hari 1 Malam (Standar Rekomendasi)</option>
+                <option value="3">3 Hari 2 Malam (Jelajah Santai)</option>
+                <option value="4">4 Hari 3 Malam (Ekspedisi Khusus)</option>
+              </select>
+              <p class="text-[11px] text-slate-500 mt-1">
+                Sesuai batas maksimal izin operasional basecamp.
+              </p>
+            </div>
+          </div>
+
+          <!-- Dynamic Live Weather & Quota Card -->
+          <div id="mountain-preview-card" class="mt-6 bg-slate-50 border border-slate-200 rounded-xl p-4.5 transition">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+                  SG
+                </div>
+                <div>
+                  <span id="preview-mountain-name" class="font-bold text-sm text-slate-900">Gunung Merbabu</span>
+                  <span id="preview-mountain-elevation" class="text-xs text-slate-500 ml-1.5">(3.142 mdpl)</span>
+                </div>
+              </div>
+
+              <!-- Quota status indicator -->
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-500">Status Kuota:</span>
+                <span id="preview-quota-badge" class="font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                  128 sisa dari 400
+                </span>
+              </div>
+            </div>
+
+            <!-- Weather forecast sub-panel -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-slate-500">Prakiraan Cuaca BMKG:</span>
+                <span id="preview-weather-condition" class="font-semibold text-slate-800">Badai Hujan & Angin Kencang</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-500">Suhu Puncak:</span>
+                <span id="preview-weather-temp" class="font-bold text-slate-800 font-mono">8°C</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-500">Kecepatan Angin:</span>
+                <span id="preview-weather-wind" class="font-bold text-slate-800 font-mono">48 knot</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Weather Warning Banner (Displayed when mountain weather status is warning) -->
+            <div id="preview-weather-alert-box" class="mt-3 p-3 rounded-lg bg-red-50 border border-red-300 text-red-900 text-xs hidden">
+              <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <div>
+                  <span class="font-bold uppercase tracking-wider text-red-700">Peringatan Dini Cuaca BMKG Aktif</span>
+                  <p id="preview-weather-alert-message" class="text-red-800 mt-0.5 leading-relaxed">
+                    BMKG mendeteksi potensi cuaca membahayakan di gunung ini. Registrasi tetap dapat diproses, dan Anda berhak atas 3 opsi mitigasi jika cuaca ekstrem berlanjut.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STEP 2: DATA KETUA & ANGGOTA ROMBONGAN                           -->
+        <!-- ================================================================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm">
+              2
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">
+                Data Ketua Rombongan & Anggota Pendaki
+              </h2>
+              <p class="text-xs text-slate-500">
+                Sesuai regulasi keselamatan Taman Nasional, pendakian solo dilarang (wajib minimal 2 orang per rombongan).
+              </p>
+            </div>
+          </div>
+
+          <!-- Section: Data Ketua Rombongan -->
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-5 mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                <h3 class="text-sm font-bold text-emerald-950 uppercase tracking-wide">
+                  Data Ketua Rombongan (Penanggung Jawab)
+                </h3>
+              </div>
+              <span class="text-[11px] font-semibold text-emerald-800 bg-white/80 px-2.5 py-0.5 rounded-md border border-emerald-300">
+                Wajib Usia ≥17 Tahun
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Nama Ketua -->
+              <div>
+                <label for="leader-name" class="block text-xs font-semibold text-slate-700 mb-1">
+                  Nama Lengkap (Sesuai KTP) <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="leader-name" name="leaderName" placeholder="Contoh: Andi Pratama" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+              </div>
+
+              <!-- NIK Ketua -->
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="leader-nik" class="block text-xs font-semibold text-slate-700">
+                    Nomor Induk Kependudukan (NIK) <span class="text-red-500">*</span>
+                  </label>
+                  <span id="leader-nik-counter" class="text-[11px] text-slate-500 font-mono">0/16 digit</span>
+                </div>
+                <input type="text" id="leader-nik" name="leaderNik" maxlength="16" placeholder="16 digit NIK e-KTP" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+              </div>
+
+              <!-- No Telp/WhatsApp Ketua -->
+              <div>
+                <label for="leader-phone" class="block text-xs font-semibold text-slate-700 mb-1">
+                  Nomor WhatsApp / HP Aktif <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" id="leader-phone" name="leaderPhone" placeholder="Contoh: 081234567890" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                <p class="text-[11px] text-slate-500 mt-1">Notifikasi status cuaca & tiket akan dikirim ke nomor ini.</p>
+              </div>
+
+              <!-- Kontak Darurat -->
+              <div>
+                <label for="leader-emergency" class="block text-xs font-semibold text-slate-700 mb-1">
+                  Kontak Darurat Keluarga & Hubungan <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="leader-emergency" name="leaderEmergency" placeholder="Contoh: 081987654321 (Ayah)" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                <p class="text-[11px] text-slate-500 mt-1">Dihubungi hanya pada kondisi evakuasi darurat SAR basecamp.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Anggota Rombongan -->
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">
+                  Jumlah Anggota Rombongan
+                </h3>
+                <p class="text-xs text-slate-500">
+                  Total seluruh personel (Ketua + Anggota). Minimal 2 orang, maksimal 10 orang.
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label for="members-count" class="text-xs font-bold text-slate-700">Total Personel:</label>
+                <select id="members-count" name="membersCount" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition shadow-sm">
+                  <option value="2">2 Orang (1 Ketua + 1 Anggota)</option>
+                  <option value="3" selected>3 Orang (1 Ketua + 2 Anggota)</option>
+                  <option value="4">4 Orang (1 Ketua + 3 Anggota)</option>
+                  <option value="5">5 Orang (1 Ketua + 4 Anggota)</option>
+                  <option value="6">6 Orang (1 Ketua + 5 Anggota)</option>
+                  <option value="7">7 Orang (1 Ketua + 6 Anggota)</option>
+                  <option value="8">8 Orang (1 Ketua + 7 Anggota)</option>
+                  <option value="9">9 Orang (1 Ketua + 8 Anggota)</option>
+                  <option value="10">10 Orang (1 Ketua + 9 Anggota)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Dynamic Anggota Container -->
+            <div id="members-container" class="space-y-3 pt-2">
+              <!-- Dynamically populated by js/booking.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STEP 3: SKRINING KESIAPAN ALAT & KESELAMATAN                     -->
+        <!-- ================================================================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm">
+                3
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">
+                  Skrining Kesiapan Alat & Keselamatan
+                </h2>
+                <p class="text-xs text-slate-500">
+                  Pemeriksaan fisik logistik wajib saat registrasi ulang di pos perizinan basecamp.
+                </p>
+              </div>
+            </div>
+
+            <button type="button" id="btn-check-all-equip" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition">
+              Centang Semua Alat
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Checklist Perlengkapan Wajib Standar Konservasi:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <!-- Tenda -->
+              <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="equip-tent" class="equipment-checkbox mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                <div class="text-xs">
+                  <span class="font-bold text-slate-900">Tenda Double Layer Tahan Badai</span>
+                  <p class="text-slate-500 mt-0.5">Memiliki flysheet waterproof & frame kokoh tahan hembusan angin puncak.</p>
+                </div>
+              </label>
+
+              <!-- Sleeping Bag -->
+              <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="equip-sb" class="equipment-checkbox mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                <div class="text-xs">
+                  <span class="font-bold text-slate-900">Sleeping Bag / Kantong Tidur per Orang</span>
+                  <p class="text-slate-500 mt-0.5">Kapasitas suhu ekstrem &lt;10°C untuk pencegahan hipotermia.</p>
+                </div>
+              </label>
+
+              <!-- Jas Hujan -->
+              <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="equip-raincoat" class="equipment-checkbox mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                <div class="text-xs">
+                  <span class="font-bold text-slate-900">Jas Hujan / Ponco Waterproof per Orang</span>
+                  <p class="text-slate-500 mt-0.5">Bahan tebal bukan plastik sekali pakai, melindungi tubuh dan carrier ransel.</p>
+                </div>
+              </label>
+
+              <!-- Matras -->
+              <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="equip-mat" class="equipment-checkbox mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                <div class="text-xs">
+                  <span class="font-bold text-slate-900">Matras Thermal Isolasi Tanah</span>
+                  <p class="text-slate-500 mt-0.5">Mencegah konduksi dingin dari permukaan tanah saat berkemah.</p>
+                </div>
+              </label>
+
+              <!-- P3K -->
+              <label class="sm:col-span-2 flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 cursor-pointer transition">
+                <input type="checkbox" id="equip-firstaid" class="equipment-checkbox mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                <div class="text-xs">
+                  <span class="font-bold text-slate-900">Kotak P3K Esensial & Obat Pribadi</span>
+                  <p class="text-slate-500 mt-0.5">Perban steril, betadine, obat lambung, paracetamol, minyak kayu putih, dan oksigen portabel.</p>
+                </div>
+              </label>
+            </div>
+
+            <!-- Health Confirmation -->
+            <div class="pt-4 border-t border-slate-200">
+              <label class="flex items-start gap-3 p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 cursor-pointer">
+                <input type="checkbox" id="health-confirm" required class="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-amber-300">
+                <div class="text-xs text-amber-950">
+                  <span class="font-bold">Konfirmasi Kondisi Fisik Sehat & Siap Mendaki</span>
+                  <p class="text-amber-800 mt-0.5 leading-relaxed">
+                    Saya menyatakan bahwa seluruh anggota rombongan dalam kondisi fisik sehat, tidak memiliki riwayat penyakit jantung/asma akut, serta siap mematuhi instruksi Ranger Pos Basecamp demi keselamatan bersama.
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STEP 4: JASA PORTER LOKAL PAGUYUBAN BASECAMP                     -->
+        <!-- ================================================================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm">
+              4
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">
+                Jasa Porter Lokal Paguyuban Basecamp (Pemberdayaan Masyarakat)
+              </h2>
+              <p class="text-xs text-slate-500">
+                Dukungan ekonomi warga lokal lingkar gunung binaan Taman Nasional.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100/50 border border-emerald-200 rounded-2xl p-5 sm:p-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex items-start gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-extrabold text-base text-emerald-950">
+                      Porter Resmi Paguyuban Warga Lokal
+                    </h3>
+                    <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-200 text-emerald-900">
+                      Resmi & Berlisensi
+                    </span>
+                  </div>
+                  <p class="text-xs text-emerald-900/80 mt-1 max-w-xl leading-relaxed">
+                    Porter warga lokal terlatih membawa beban logistik s.d 20 kg per porter, menguasai medan jalur, memasak di camp area, serta memiliki sertifikasi pertolongan pertama (PPGD/SAR dasar).
+                  </p>
+                  <p class="text-xs font-extrabold text-emerald-900 mt-2">
+                    Tarif Paguyuban: <span class="text-emerald-700 font-mono text-sm font-extrabold">Rp 350.000</span> / orang porter
+                  </p>
+                </div>
+              </div>
+
+              <!-- Add-on Toggle and Porter Count -->
+              <div class="flex-shrink-0 w-full sm:w-auto bg-white p-3.5 rounded-xl border border-emerald-300 shadow-sm space-y-3">
+                <label class="flex items-center gap-2.5 cursor-pointer">
+                  <input type="checkbox" id="porter-addon" name="porterLocal" class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                  <span class="text-xs font-bold text-slate-900">Sewa Porter Lokal</span>
+                </label>
+
+                <div id="porter-count-wrapper" class="hidden flex items-center gap-2 pt-2 border-t border-slate-100">
+                  <label for="porter-count" class="text-xs text-slate-600">Jumlah:</label>
+                  <select id="porter-count" name="porterCount" class="text-xs font-bold border border-slate-300 rounded px-2 py-1 bg-white focus:ring-emerald-500">
+                    <option value="1">1 Orang Porter (Beban 20 kg)</option>
+                    <option value="2">2 Orang Porter (Beban 40 kg)</option>
+                    <option value="3">3 Orang Porter (Beban 60 kg)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- STEP 5: RINGKASAN BIAYA & SIMULASI CHECKOUT                      -->
+        <!-- ================================================================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shadow-sm">
+              5
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">
+                Ringkasan Biaya & Simulasi Checkout Pembayaran
+              </h2>
+              <p class="text-xs text-slate-500">
+                Perhitungan transparan PNBP, asuransi evakuasi, dan jaminan mitigasi badai.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Payment Methods -->
+            <div class="lg:col-span-7 space-y-4">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                Pilih Metode Pembayaran (Simulasi Instan):
+              </label>
+
+              <!-- Option 1: QRIS Dinamis -->
+              <label class="flex items-center justify-between p-4 rounded-xl border-2 border-emerald-600 bg-emerald-50/40 cursor-pointer transition">
+                <div class="flex items-center gap-3">
+                  <input type="radio" name="paymentMethod" value="QRIS" checked class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                  <div>
+                    <span class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                      <span>QRIS Dinamis</span>
+                      <span class="text-[10px] font-extrabold uppercase bg-emerald-600 text-white px-1.5 py-0.5 rounded">Rekomendasi</span>
+                    </span>
+                    <p class="text-xs text-slate-500 mt-0.5">GoPay, OVO, Dana, ShopeePay, LinkAja & Seluruh Mobile Banking.</p>
+                  </div>
+                </div>
+                <div class="text-xs font-bold text-emerald-800 bg-white px-2.5 py-1 rounded border border-emerald-300">
+                  Verifikasi Otomatis
+                </div>
+              </label>
+
+              <!-- Option 2: Virtual Account -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                <div class="flex items-center gap-3">
+                  <input type="radio" name="paymentMethod" value="VA_BCA" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                  <div>
+                    <span class="text-sm font-bold text-slate-900">Virtual Account (BCA / Mandiri / BRI / BNI)</span>
+                    <p class="text-xs text-slate-500 mt-0.5">Nomor akun virtual unik tanpa perlu upload bukti transfer fisik.</p>
+                  </div>
+                </div>
+                <span class="text-xs text-slate-500 font-mono">1x24 Jam</span>
+              </label>
+
+              <!-- Option 3: E-Wallet -->
+              <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+                <div class="flex items-center gap-3">
+                  <input type="radio" name="paymentMethod" value="EWALLET" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                  <div>
+                    <span class="text-sm font-bold text-slate-900">E-Wallet Direct Debit</span>
+                    <p class="text-xs text-slate-500 mt-0.5">Penyelesaian instan melalui aplikasi dompet digital ponsel.</p>
+                  </div>
+                </div>
+                <span class="text-xs text-slate-500 font-mono">Instan</span>
+              </label>
+
+              <!-- Safety Policy Assurance -->
+              <div class="p-3.5 bg-slate-100 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+                <div class="flex items-center gap-1.5 font-bold text-slate-800">
+                  <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                  <span>Jaminan Perlindungan Mitigasi Badai BMKG:</span>
+                </div>
+                <p class="leading-relaxed text-[11px]">
+                  Jika tanggal pendakian Anda terdeteksi cuaca ekstrem BMKG, dana Anda dilindungi 100% dengan opsi bebas reschedule tanggal atau refund penuh tanpa potongan.
+                </p>
+              </div>
+            </div>
+
+            <!-- Right Column: Price Breakdown Card (payment-summary) -->
+            <div class="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800">
+              <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 pb-3 border-b border-slate-800">
+                Rincian Biaya Reservasi
+              </h3>
+
+              <div id="payment-summary" class="py-4 space-y-3 text-xs">
+                <!-- Tiket Masuk -->
+                <div class="flex items-center justify-between text-slate-300">
+                  <div>
+                    <span id="summary-ticket-label">Tiket Masuk PNBP (3 orang)</span>
+                    <p id="summary-ticket-rate" class="text-[10px] text-slate-400">@ Rp 25.000 / orang</p>
+                  </div>
+                  <span id="summary-ticket-subtotal" class="font-mono font-semibold text-white">Rp 75.000</span>
+                </div>
+
+                <!-- Asuransi -->
+                <div class="flex items-center justify-between text-slate-300">
+                  <div>
+                    <span id="summary-insurance-label">Asuransi Jiwa & SAR (3 orang)</span>
+                    <p class="text-[10px] text-slate-400">@ Rp 5.000 / orang (Wajib)</p>
+                  </div>
+                  <span id="summary-insurance-subtotal" class="font-mono font-semibold text-white">Rp 15.000</span>
+                </div>
+
+                <!-- Porter Warga -->
+                <div id="summary-porter-row" class="flex items-center justify-between text-slate-300 hidden">
+                  <div>
+                    <span id="summary-porter-label">Jasa Porter Paguyuban (1 orang)</span>
+                    <p class="text-[10px] text-slate-400">Pemberdayaan Warga Lokal</p>
+                  </div>
+                  <span id="summary-porter-subtotal" class="font-mono font-semibold text-emerald-400">Rp 350.000</span>
+                </div>
+
+                <!-- Jaminan BMKG -->
+                <div class="flex items-center justify-between text-slate-300">
+                  <div>
+                    <span>Garansi Mitigasi Cuaca BMKG</span>
+                    <p class="text-[10px] text-emerald-400">Opsi Reschedule / Refund 100%</p>
+                  </div>
+                  <span class="font-semibold text-emerald-400">GRATIS</span>
+                </div>
+              </div>
+
+              <!-- Total Payable -->
+              <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Pembayaran</p>
+                  <p class="text-[11px] text-slate-400">Termasuk seluruh pajak & PNBP</p>
+                </div>
+                <div class="text-right">
+                  <span id="summary-total-display" class="font-extrabold text-2xl text-emerald-400 font-mono">
+                    Rp 90.000
+                  </span>
+                </div>
+              </div>
+
+              <!-- Validation Error Box -->
+              <div id="booking-error-msg" class="mt-4 p-3 rounded-xl bg-red-950/80 border border-red-800 text-red-200 text-xs hidden leading-relaxed">
+                <!-- Injected dynamically on invalid form -->
+              </div>
+
+              <!-- Submit CTA Button -->
+              <button type="button" id="submit-booking-btn" class="mt-6 w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-sm shadow-lg hover:shadow-emerald-500/20 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5 text-emerald-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Bayar & Terbitkan E-Tiket SIMAKSI</span>
+              </button>
+
+              <p class="text-[10px] text-slate-400 text-center mt-3">
+                Simulasi instan. E-Tiket resmi dengan QR Code unik langsung diterbitkan.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- TRANSACTION SUCCESS MODAL (success-modal)                             -->
+  <!-- ===================================================================== -->
+  <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-center relative overflow-hidden">
+      
+      <!-- Green Success Icon -->
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+
+      <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+        Pembayaran Berhasil!
+      </h3>
+      <p class="text-slate-600 text-xs sm:text-sm mt-1">
+        Surat Izin Masuk Kawasan Konservasi (SIMAKSI) telah resmi diterbitkan.
+      </p>
+
+      <!-- Booking ID Display Box -->
+      <div class="my-5 p-4 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Nomor Registrasi SIMAKSI:</span>
+          <span id="modal-booking-id" class="font-mono font-extrabold text-emerald-700 text-sm">
+            SMK-202609XX-XXXX
+          </span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Gunung & Basecamp:</span>
+          <span id="modal-booking-destination" class="font-bold text-slate-800">
+            Gunung Merbabu - Jalur Selo
+          </span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Tanggal & Rombongan:</span>
+          <span id="modal-booking-date" class="font-medium text-slate-800">
+            2026-09-20 (3 Pendaki)
+          </span>
+        </div>
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+          <span class="text-slate-500 font-semibold">Total Pembayaran:</span>
+          <span id="modal-booking-total" class="font-mono font-bold text-emerald-600">
+            Rp 90.000
+          </span>
+        </div>
+      </div>
+
+      <!-- Warning notice if the mountain has weather alert -->
+      <div id="modal-weather-alert-notice" class="hidden my-4 p-3.5 rounded-xl bg-red-50 border border-red-300 text-left text-xs text-red-900">
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center flex-shrink-0 font-bold text-[11px]">
+            !
+          </div>
+          <div>
+            <span class="font-bold text-red-800 uppercase tracking-wide">Perhatian Cuaca Ekstrem BMKG:</span>
+            <p class="text-red-700 mt-0.5 leading-relaxed">
+              Kawasan terpantau dalam status peringatan dini badai BMKG. Tiket Anda diterbitkan dengan status <strong class="text-red-900">WEATHER_WARNING</strong>. Anda dapat memilih 3 opsi mitigasi (Tetap Naik, Reschedule Bebas Biaya, atau Refund 100%) di halaman E-Tiket.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="space-y-3 pt-2">
+        <a id="modal-view-ticket-btn" href="ticket.html" class="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+          <span>Buka E-Tiket Resmi Saya</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </a>
+
+        <p class="text-[11px] text-slate-500">
+          Dialihkan secara otomatis dalam <span id="modal-countdown" class="font-bold text-emerald-700">3</span> detik...
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer Container (Injected by js/navbar.js) -->
+  <div id="footer-container"></div>
+
+  <!-- JavaScript Modules & Business Logic -->
+  <script src="js/store.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>
