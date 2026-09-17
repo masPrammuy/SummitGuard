@@ -30,6 +30,25 @@
     const isTicket = activePage === 'ticket' || activePage === 'tiket';
     const isAdmin = activePage === 'admin' || activePage === 'bmkg' || activePage === 'simulasi';
 
+    // Retrieve active user from SummitSupabase if available
+    let currentUser = null;
+    if (typeof SummitSupabase !== 'undefined' && SummitSupabase && typeof SummitSupabase.getUser === 'function') {
+      try {
+        currentUser = SummitSupabase.getUser();
+      } catch (e) {
+        currentUser = null;
+      }
+    }
+
+    const displayName = (currentUser && currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
+                        (currentUser && (currentUser.name || currentUser.full_name)) ||
+                        (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Pendaki');
+
+    const userEmail = (currentUser && currentUser.email) || '';
+    const avatarUrl = (currentUser && currentUser.user_metadata && currentUser.user_metadata.avatar_url) ||
+                      (currentUser && currentUser.avatar_url) || null;
+    const initialLetter = (displayName || 'P').charAt(0).toUpperCase();
+
     const navHtml = `
     <nav class="bg-emerald-900 text-white shadow-md border-b border-emerald-800 relative z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,6 +107,37 @@
               <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
               <span>⚡ Simulasi BMKG</span>
             </a>
+
+            <!-- User Auth Profile Widget or Login Button -->
+            ${currentUser ? `
+            <div class="ml-2 pl-2 border-l border-emerald-800/80 flex items-center gap-2" id="navbar-user-widget">
+              <div class="flex items-center gap-2 bg-emerald-950/70 border border-emerald-700/60 rounded-full py-1 px-2.5 shadow-sm text-xs" title="${userEmail}">
+                ${avatarUrl ? `
+                  <img src="${avatarUrl}" alt="${displayName}" class="w-6 h-6 rounded-full object-cover ring-1 ring-emerald-400" />
+                ` : `
+                  <div class="w-6 h-6 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-xs shadow-inner">
+                    ${initialLetter}
+                  </div>
+                `}
+                <span class="font-medium text-emerald-100 max-w-[110px] truncate" id="navbar-user-display-name">${displayName}</span>
+              </div>
+              <button type="button" id="navbar-logout-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-200 hover:text-white bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 shadow-sm transition hover:scale-105" title="Keluar dari akun">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span>Keluar</span>
+              </button>
+            </div>
+            ` : `
+            <div class="ml-2 pl-2 border-l border-emerald-800/80 flex items-center" id="navbar-guest-widget">
+              <a href="login.html" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-emerald-950 bg-emerald-400 hover:bg-emerald-300 shadow transition hover:scale-105">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                </svg>
+                <span>Masuk</span>
+              </a>
+            </div>
+            `}
           </div>
 
           <!-- Mobile Hamburger Toggle Button -->
@@ -127,6 +177,40 @@
             <span>⚡ Panel Simulasi BMKG</span>
           </a>
         </div>
+
+        <!-- Mobile Action / User Profile -->
+        ${currentUser ? `
+        <div class="pt-3 pb-1 border-t border-emerald-800/80 flex items-center justify-between" id="navbar-mobile-user-widget">
+          <div class="flex items-center gap-2.5">
+            ${avatarUrl ? `
+              <img src="${avatarUrl}" alt="${displayName}" class="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-400" />
+            ` : `
+              <div class="w-8 h-8 rounded-full bg-emerald-700 text-white font-bold flex items-center justify-center text-sm shadow">
+                ${initialLetter}
+              </div>
+            `}
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-white truncate max-w-[170px]">${displayName}</span>
+              ${userEmail ? `<span class="text-[11px] text-emerald-300/80 truncate max-w-[170px]">${userEmail}</span>` : ''}
+            </div>
+          </div>
+          <button type="button" id="navbar-mobile-logout-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-200 bg-rose-950/60 border border-rose-800/60 hover:bg-rose-900 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span>Keluar</span>
+          </button>
+        </div>
+        ` : `
+        <div class="pt-2 border-t border-emerald-800/80" id="navbar-mobile-guest-widget">
+          <a href="login.html" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-bold text-emerald-950 bg-emerald-400 hover:bg-emerald-300 shadow">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+            </svg>
+            <span>Masuk ke Akun</span>
+          </a>
+        </div>
+        `}
       </div>
     </nav>
     `;
@@ -173,6 +257,24 @@
             }
           });
         }
+
+        // Attach logout event listeners to Keluar buttons
+        const logoutBtns = targetEl.querySelectorAll('#navbar-logout-btn, #navbar-mobile-logout-btn');
+        logoutBtns.forEach(function(btn) {
+          btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (typeof SummitAuthGuard !== 'undefined' && typeof SummitAuthGuard.logoutAndRedirect === 'function') {
+              await SummitAuthGuard.logoutAndRedirect('login.html');
+            } else if (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.logout === 'function') {
+              await SummitSupabase.logout();
+              if (typeof window !== 'undefined') {
+                window.location.href = 'login.html';
+              }
+            } else if (typeof window !== 'undefined') {
+              window.location.href = 'login.html';
+            }
+          });
+        });
       }
     }
 
