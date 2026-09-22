@@ -209,6 +209,18 @@
   }
 
   /**
+   * Helper to normalize and sanitize Supabase base URL
+   * Strips trailing slashes and /rest/v1 subpaths
+   */
+  function _cleanSupabaseUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    let cleaned = url.trim();
+    cleaned = cleaned.replace(/\/rest\/v1\/?$/i, '');
+    cleaned = cleaned.replace(/\/+$/, '');
+    return cleaned;
+  }
+
+  /**
    * SummitSupabase API Client
    */
   const SummitSupabase = {
@@ -224,8 +236,8 @@
       const envKey = env.SUPABASE_ANON_KEY || env.anonKey || '';
 
       return {
-        url: storedUrl || envUrl || '',
-        anonKey: storedKey || envKey || ''
+        url: _cleanSupabaseUrl(storedUrl || envUrl || ''),
+        anonKey: (storedKey || envKey || '').trim()
       };
     },
 
@@ -234,9 +246,11 @@
      */
     saveSupabaseConfig: function (url, anonKey) {
       if (url && anonKey) {
-        _setItem(STORAGE_KEYS.CONFIG_URL, url.trim());
-        _setItem(STORAGE_KEYS.CONFIG_KEY, anonKey.trim());
-        return this.initSupabase(url.trim(), anonKey.trim());
+        const cleanUrl = _cleanSupabaseUrl(url);
+        const cleanKey = anonKey.trim();
+        _setItem(STORAGE_KEYS.CONFIG_URL, cleanUrl);
+        _setItem(STORAGE_KEYS.CONFIG_KEY, cleanKey);
+        return this.initSupabase(cleanUrl, cleanKey);
       } else {
         _removeItem(STORAGE_KEYS.CONFIG_URL);
         _removeItem(STORAGE_KEYS.CONFIG_KEY);
@@ -263,8 +277,8 @@
      */
     initSupabase: function (url, anonKey) {
       const cfg = this.getSupabaseConfig();
-      const targetUrl = url || cfg.url;
-      const targetKey = anonKey || cfg.anonKey;
+      const targetUrl = _cleanSupabaseUrl(url || cfg.url);
+      const targetKey = (anonKey || cfg.anonKey || '').trim();
 
       if (!targetUrl || !targetKey) {
         _client = null;
