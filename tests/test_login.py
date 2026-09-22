@@ -47,6 +47,7 @@ class TestLogin(unittest.TestCase):
         self.assertIn("js/supabase-client.js", content, "login.html must include js/supabase-client.js")
         self.assertIn("js/auth-guard.js", content, "login.html must include js/auth-guard.js")
         self.assertIn("js/login.js", content, "login.html must include js/login.js")
+        self.assertNotIn("js/navbar.js", content, "login.html should not include js/navbar.js since it has a dedicated header")
 
     def test_login_html_elements_and_forms(self):
         """Verify required IDs, inputs, buttons, brand logo, and alert container in login.html."""
@@ -149,6 +150,44 @@ class TestLogin(unittest.TestCase):
 
         # Initial auth check using SummitSupabase.getSession()
         self.assertIn("SummitSupabase.getSession", content, "init() must verify existing session via SummitSupabase.getSession")
+
+    def test_alert_dom_xss_protection(self):
+        """Verify DOM XSS protection: _escapeHtml helper escapes special chars and is called in showAlert."""
+        if not os.path.exists(self.js_path):
+            self.fail(f"{self.js_path} does not exist")
+
+        with open(self.js_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # HTML escaping helper
+        self.assertIn("function _escapeHtml", content, "js/login.js must define _escapeHtml helper")
+        self.assertIn("&amp;", content)
+        self.assertIn("&lt;", content)
+        self.assertIn("&gt;", content)
+        self.assertIn("&quot;", content)
+        self.assertIn("&#39;", content)
+
+        # showAlert escaping
+        self.assertIn("_escapeHtml(message)", content, "showAlert must escape message before embedding into DOM")
+
+    def test_sanitize_redirect_hardening(self):
+        """Verify _sanitizeRedirectUrl hardening against backslashes, external origins, and login self-redirect loops."""
+        if not os.path.exists(self.js_path):
+            self.fail(f"{self.js_path} does not exist")
+
+        with open(self.js_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Backslash rejection
+        self.assertIn(r"trimmed.includes('\\')", content, "_sanitizeRedirectUrl must reject backslashes")
+
+        # Self-redirect loop rejection
+        self.assertIn("_isLoginTarget", content, "js/login.js must define _isLoginTarget helper")
+        self.assertIn(r"/(^|\/)login(\.html)?$/i", content, "_isLoginTarget must match login path boundaries")
+
+        # Origin verification & scheme rejection
+        self.assertIn("parsed.origin !== baseOrigin", content, "_sanitizeRedirectUrl must verify origin equality")
+        self.assertIn("index.html", content, "_sanitizeRedirectUrl must fallback to index.html")
 
     def test_syntax_and_bracket_integrity(self):
         """Verify bracket matching and absence of UTF-8 mojibake in js/login.js."""

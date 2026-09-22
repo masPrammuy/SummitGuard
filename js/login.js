@@ -29,7 +29,33 @@
   }
 
   /**
-   * Sanitize redirect target URL to prevent open redirect vulnerabilities
+   * Safe HTML escaping helper to prevent DOM XSS in alerts and UI elements
+   * @param {*} str
+   * @returns {string}
+   */
+  function _escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#39;');
+  }
+
+  /**
+   * Check if a target pathname points to the login page to avoid self-redirect loops
+   * @param {string} pathname
+   * @returns {boolean}
+   */
+  function _isLoginTarget(pathname) {
+    if (!pathname || typeof pathname !== 'string') return false;
+    const cleanPath = pathname.split('?')[0].split('#')[0].toLowerCase();
+    return /(^|\/)login(\.html)?$/i.test(cleanPath);
+  }
+
+  /**
+   * Sanitize redirect target URL to prevent open redirect vulnerabilities and self loops
    * @param {string} url
    * @returns {string}
    */
@@ -37,27 +63,49 @@
     if (!url || typeof url !== 'string') return 'index.html';
     const trimmed = url.trim();
 
-    // Block protocol-relative URLs (//example.com) and javascript:
-    if (trimmed.startsWith('//') || trimmed.toLowerCase().startsWith('javascript:')) {
+    // Reject backslashes which browsers normalize into protocol-relative external redirects
+    if (trimmed.includes('\\')) {
       return 'index.html';
     }
 
-    // Absolute URLs: allow only if origin matches current location origin
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      if (_isBrowser() && window.location && window.location.origin) {
-        try {
-          const parsed = new URL(trimmed, window.location.origin);
-          if (parsed.origin === window.location.origin) {
-            return parsed.pathname + parsed.search + parsed.hash;
-          }
-        } catch (e) {
-          return 'index.html';
-        }
+    // Reject self-redirect loops
+    if (_isLoginTarget(trimmed)) {
+      return 'index.html';
+    }
+
+    // Reject protocol-relative URLs and non-http/https schemes (javascript:, data:, vbscript:, etc.)
+    if (trimmed.startsWith('//') || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
+      if (!trimmed.toLowerCase().startsWith('http://') && !trimmed.toLowerCase().startsWith('https://')) {
+        return 'index.html';
       }
-      return 'index.html';
     }
 
-    return trimmed;
+    const baseOrigin = (_isBrowser() && window.location && window.location.origin)
+      ? window.location.origin
+      : 'http://localhost';
+
+    try {
+      const parsed = new URL(trimmed, baseOrigin);
+
+      // Verify origin matches current origin to prevent external open redirects
+      if (parsed.origin !== baseOrigin) {
+        return 'index.html';
+      }
+
+      // Verify resolved path does not point back to login page
+      if (_isLoginTarget(parsed.pathname)) {
+        return 'index.html';
+      }
+
+      // If relative URL without leading slash, preserve relative format
+      if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
+        return trimmed;
+      }
+
+      return parsed.pathname + parsed.search + parsed.hash;
+    } catch (e) {
+      return 'index.html';
+    }
   }
 
   /**
@@ -106,7 +154,7 @@
     }
 
     alertEl.className = 'p-3.5 rounded-xl text-xs border leading-relaxed flex items-start gap-2.5 ' + bgClasses;
-    alertEl.innerHTML = iconSvg + '<div class="flex-1">' + message + '</div>';
+    alertEl.innerHTML = iconSvg + '<div class="flex-1">' + _escapeHtml(message) + '</div>';
     alertEl.classList.remove('hidden');
   }
 
@@ -504,6 +552,8 @@
     getRedirectUrl: getRedirectUrl,
     showAlert: showAlert,
     clearAlert: clearAlert,
-    init: init
+    init: init,
+    _sanitizeRedirectUrl: _sanitizeRedirectUrl,
+    _escapeHtml: _escapeHtml
   };
 }));
