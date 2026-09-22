@@ -160,6 +160,11 @@
     return JSON.parse(JSON.stringify(data));
   }
 
+  // Helper untuk memvalidasi UUID format standar RFC 4122
+  function _isUuid(id) {
+    return typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  }
+
   // Safe local date string helper avoiding UTC timezone skew
   function getLocalDateString(d) {
     const date = d || new Date();
@@ -262,7 +267,7 @@
 
       // Sinkronisasi pembaruan cuaca gunung ke Supabase PostgreSQL database jika terhubung
       try {
-        this.syncToSupabase('mountain', mountains[index]);
+        this.syncToSupabase('mountain', mountains[index]).catch(function () {});
       } catch (e) {
         // Fallback aman offline
       }
@@ -388,11 +393,11 @@
 
       // Sinkronisasi booking baru dan kuota gunung ke Supabase PostgreSQL database
       try {
-        this.syncToSupabase('booking', newBooking);
+        this.syncToSupabase('booking', newBooking).catch(function () {});
         if (mountain) {
           const updatedMountain = this.getMountain(mountain.id);
           if (updatedMountain) {
-            this.syncToSupabase('mountain', updatedMountain);
+            this.syncToSupabase('mountain', updatedMountain).catch(function () {});
           }
         }
       } catch (e) {
@@ -477,7 +482,7 @@
 
       // Sinkronisasi status mitigasi risiko tinggi ke Supabase PostgreSQL database
       try {
-        this.syncToSupabase('booking', booking);
+        this.syncToSupabase('booking', booking).catch(function () {});
       } catch (e) {
         // Fallback aman offline
       }
@@ -515,7 +520,7 @@
 
       // Sinkronisasi penjadwalan ulang ke Supabase PostgreSQL database
       try {
-        this.syncToSupabase('booking', booking);
+        this.syncToSupabase('booking', booking).catch(function () {});
       } catch (e) {
         // Fallback aman offline
       }
@@ -576,9 +581,9 @@
 
       // Sinkronisasi pembatalan refund & pengembalian kuota ke Supabase PostgreSQL database
       try {
-        this.syncToSupabase('booking', booking);
+        this.syncToSupabase('booking', booking).catch(function () {});
         if (mIndex !== -1) {
-          this.syncToSupabase('mountain', mountains[mIndex]);
+          this.syncToSupabase('mountain', mountains[mIndex]).catch(function () {});
         }
       } catch (e) {
         // Fallback aman offline
@@ -633,7 +638,8 @@
         }
 
         if (entityType === 'booking') {
-          const userId = (typeof SummitSupabase !== 'undefined' && SummitSupabase.getUser()?.id) || data.userId || null;
+          const rawUserId = (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || data.userId || null;
+          const userId = _isUuid(rawUserId) ? rawUserId : null;
           const payload = {
             id: data.id || data.bookingId,
             user_id: userId,
@@ -671,7 +677,8 @@
             daily_quota: data.dailyQuota,
             remaining_quota: data.remainingQuota,
             ticket_price: data.ticketPrice,
-            weather: data.weather || {}
+            weather: data.weather || {},
+            updated_at: new Date().toISOString()
           };
 
           const res = await client.from('mountains').upsert(payload);
@@ -702,7 +709,8 @@
           return { success: false, reason: 'SUPABASE_NOT_CONFIGURED', bookings: this.getBookings() };
         }
 
-        const effectiveUserId = userId || (typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || null;
+        const rawUserId = userId || (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || null;
+        const effectiveUserId = _isUuid(rawUserId) ? rawUserId : null;
         if (!effectiveUserId) {
           return { success: false, reason: 'NO_USER_ID', bookings: this.getBookings() };
         }

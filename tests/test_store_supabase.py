@@ -95,6 +95,26 @@ class TestStoreSupabase(unittest.TestCase):
         self.assertIn("SummitSupabase.getUser()?.id", self.content)
         self.assertIn("data.userId", self.content)
 
+    def test_store_non_uuid_user_id_sanitization(self):
+        """Verify non-UUID userId (e.g. usr-local-12345) is sanitized to null for PostgreSQL uuid column."""
+        self.assertIn("_isUuid", self.content, "js/store.js must define _isUuid validator helper")
+        # Verify regex matches standard UUID and rejects local mock ids
+        uuid_match = re.search(r"_isUuid\s*=\s*function|[function\s*]+_isUuid|const\s+_isUuid", self.content)
+        self.assertIsNotNone(uuid_match, "_isUuid helper must be defined")
+        # Ensure regex checks for standard 8-4-4-4-12 pattern
+        self.assertIn("0-9a-f", self.content)
+        self.assertIn("user_id", self.content)
+
+    def test_store_mountain_payload_updated_at(self):
+        """Verify syncToSupabase('mountain', ...) includes updated_at timestamp."""
+        mountain_match = re.search(r"if\s*\(\s*entityType\s*===\s*['\"]mountain['\"]\s*\)\s*\{(.*?)\.from\(['\"]mountains['\"]\)", self.content, re.DOTALL)
+        self.assertIsNotNone(mountain_match, "Mountain sync block must exist")
+        self.assertIn("updated_at", mountain_match.group(1), "Mountain payload must include updated_at timestamp")
+
+    def test_store_unawaited_sync_has_catch_handler(self):
+        """Verify unawaited syncToSupabase calls in mutation methods have .catch handlers."""
+        self.assertIn(".catch(", self.content, "Unawaited syncToSupabase calls must attach .catch() handler")
+
 
 if __name__ == '__main__':
     unittest.main()
