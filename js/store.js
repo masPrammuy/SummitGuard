@@ -638,7 +638,8 @@
         }
 
         if (entityType === 'booking') {
-          const rawUserId = (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || data.userId || null;
+          // Replaced optional chaining SummitSupabase.getUser()?.id with (SummitSupabase.getUser() && SummitSupabase.getUser().id) for backward compatibility
+          const rawUserId = (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && (SummitSupabase.getUser() && SummitSupabase.getUser().id)) || data.userId || null;
           const userId = _isUuid(rawUserId) ? rawUserId : null;
           const payload = {
             id: data.id || data.bookingId,
@@ -709,7 +710,7 @@
           return { success: false, reason: 'SUPABASE_NOT_CONFIGURED', bookings: this.getBookings() };
         }
 
-        const rawUserId = userId || (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || null;
+        const rawUserId = userId || (typeof SummitSupabase !== 'undefined' && typeof SummitSupabase.getUser === 'function' && (SummitSupabase.getUser() && SummitSupabase.getUser().id)) || null;
         const effectiveUserId = _isUuid(rawUserId) ? rawUserId : null;
         if (!effectiveUserId) {
           return { success: false, reason: 'NO_USER_ID', bookings: this.getBookings() };

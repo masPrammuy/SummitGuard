@@ -216,9 +216,16 @@
      * Ambil konfigurasi URL dan Anon Key Supabase yang tersimpan
      */
     getSupabaseConfig: function () {
+      const storedUrl = _getItem(STORAGE_KEYS.CONFIG_URL) || '';
+      const storedKey = _getItem(STORAGE_KEYS.CONFIG_KEY) || '';
+
+      const env = (typeof window !== 'undefined' ? (window.__ENV__ || window.SUMMIT_SUPABASE_CONFIG || window.ENV) : null) || {};
+      const envUrl = env.SUPABASE_URL || env.url || '';
+      const envKey = env.SUPABASE_ANON_KEY || env.anonKey || '';
+
       return {
-        url: _getItem(STORAGE_KEYS.CONFIG_URL) || '',
-        anonKey: _getItem(STORAGE_KEYS.CONFIG_KEY) || ''
+        url: storedUrl || envUrl || '',
+        anonKey: storedKey || envKey || ''
       };
     },
 
@@ -429,9 +436,7 @@
         const cleanDest = dest.startsWith('/') ? dest : '/' + dest;
         let redirectTarget = cleanDest;
         if (typeof window !== 'undefined' && window.location) {
-          const pathname = window.location.pathname || '';
-          const dir = pathname.substring(0, pathname.lastIndexOf('/'));
-          redirectTarget = window.location.origin + (dir ? dir : '') + cleanDest;
+          redirectTarget = new URL(cleanDest, window.location.origin).href;
         }
 
         const { data, error } = await client.auth.signInWithOAuth({
