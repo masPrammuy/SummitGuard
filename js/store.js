@@ -260,6 +260,13 @@
         this.saveBookings(bookings);
       }
 
+      // Sinkronisasi pembaruan cuaca gunung ke Supabase PostgreSQL database jika terhubung
+      try {
+        this.syncToSupabase('mountain', mountains[index]);
+      } catch (e) {
+        // Fallback aman offline
+      }
+
       return mountains[index];
     },
 
@@ -379,6 +386,19 @@
       bookings.unshift(newBooking);
       this.saveBookings(bookings);
 
+      // Sinkronisasi booking baru dan kuota gunung ke Supabase PostgreSQL database
+      try {
+        this.syncToSupabase('booking', newBooking);
+        if (mountain) {
+          const updatedMountain = this.getMountain(mountain.id);
+          if (updatedMountain) {
+            this.syncToSupabase('mountain', updatedMountain);
+          }
+        }
+      } catch (e) {
+        // Fallback aman offline
+      }
+
       return newBooking;
     },
 
@@ -454,6 +474,14 @@
       };
 
       this.saveBookings(bookings);
+
+      // Sinkronisasi status mitigasi risiko tinggi ke Supabase PostgreSQL database
+      try {
+        this.syncToSupabase('booking', booking);
+      } catch (e) {
+        // Fallback aman offline
+      }
+
       return { success: true, booking: booking };
     },
 
@@ -484,6 +512,14 @@
       booking.rescheduledAt = new Date().toISOString();
 
       this.saveBookings(bookings);
+
+      // Sinkronisasi penjadwalan ulang ke Supabase PostgreSQL database
+      try {
+        this.syncToSupabase('booking', booking);
+      } catch (e) {
+        // Fallback aman offline
+      }
+
       return { success: true, booking: booking };
     },
 
@@ -537,7 +573,193 @@
       }
 
       this.saveBookings(bookings);
+
+      // Sinkronisasi pembatalan refund & pengembalian kuota ke Supabase PostgreSQL database
+      try {
+        this.syncToSupabase('booking', booking);
+        if (mIndex !== -1) {
+          this.syncToSupabase('mountain', mountains[mIndex]);
+        }
+      } catch (e) {
+        // Fallback aman offline
+      }
+
       return { success: true, booking: booking };
+    },
+
+    /**
+     * Tanda tangani pakta integritas risiko tinggi (Alias executeProceedHighRisk)
+     * @param {string} bookingId
+     * @param {object} waiverData
+     */
+    signHighRiskWaiver: function (bookingId, waiverData) {
+      return this.executeProceedHighRisk(bookingId, waiverData);
+    },
+
+    /**
+     * Jadwalkan ulang tanggal pendakian SIMAKSI (Alias executeReschedule)
+     * @param {string} bookingId
+     * @param {string} newDate (format: YYYY-MM-DD)
+     */
+    rescheduleBooking: function (bookingId, newDate) {
+      return this.executeReschedule(bookingId, newDate);
+    },
+
+    /**
+     * Batalkan dan refund tiket SIMAKSI 100% (Alias executeRefund)
+     * @param {string} bookingId
+     * @param {object} refundData
+     */
+    refundBooking: function (bookingId, refundData) {
+      return this.executeRefund(bookingId, refundData);
+    },
+
+    /**
+     * Sinkronisasi entitas booking/mountain ke Supabase PostgreSQL database jika terhubung
+     * @param {string} entityType - 'booking' | 'mountain'
+     * @param {object} data
+     */
+    syncToSupabase: async function (entityType, data) {
+      if (!data) return { success: false, reason: 'NO_DATA' };
+
+      try {
+        if (typeof SummitSupabase === 'undefined' || typeof SummitSupabase.getSupabase !== 'function') {
+          return { success: false, reason: 'SUPABASE_NOT_CONFIGURED' };
+        }
+
+        const client = SummitSupabase.getSupabase();
+        if (!client) {
+          return { success: false, reason: 'SUPABASE_NOT_CONFIGURED' };
+        }
+
+        if (entityType === 'booking') {
+          const userId = (typeof SummitSupabase !== 'undefined' && SummitSupabase.getUser()?.id) || data.userId || null;
+          const payload = {
+            id: data.id || data.bookingId,
+            user_id: userId,
+            mountain_id: data.mountainId,
+            mountain_name: data.mountainName,
+            basecamp: data.basecamp,
+            climb_date: data.climbDate,
+            duration_days: data.durationDays || 2,
+            leader: data.leader || {},
+            members_count: data.membersCount,
+            members: data.members || [],
+            addons: data.addons || {},
+            total_payment: data.totalPayment,
+            status: data.status,
+            mitigation_choice: data.mitigationChoice || null,
+            high_risk_waiver_signed: !!data.highRiskWaiverSigned,
+            rescheduled_from: data.rescheduledFrom || null,
+            refund_details: data.refundDetails || null
+          };
+
+          const res = await client.from('bookings').upsert(payload);
+          if (res && res.error) {
+            return { success: false, error: res.error.message || String(res.error) };
+          }
+          return { success: true, data: res ? res.data : null };
+        }
+
+        if (entityType === 'mountain') {
+          const payload = {
+            id: data.id,
+            name: data.name,
+            elevation: data.elevation,
+            province: data.province,
+            basecamps: data.basecamps || [],
+            daily_quota: data.dailyQuota,
+            remaining_quota: data.remainingQuota,
+            ticket_price: data.ticketPrice,
+            weather: data.weather || {}
+          };
+
+          const res = await client.from('mountains').upsert(payload);
+          if (res && res.error) {
+            return { success: false, error: res.error.message || String(res.error) };
+          }
+          return { success: true, data: res ? res.data : null };
+        }
+
+        return { success: false, reason: 'UNKNOWN_ENTITY_TYPE' };
+      } catch (e) {
+        return { success: false, error: e.message || String(e) };
+      }
+    },
+
+    /**
+     * Ambil riwayat booking dari Supabase database dan perbarui cache lokal
+     * @param {string} [userId]
+     */
+    fetchBookingsFromSupabase: async function (userId) {
+      try {
+        if (typeof SummitSupabase === 'undefined' || typeof SummitSupabase.getSupabase !== 'function') {
+          return { success: false, reason: 'SUPABASE_NOT_CONFIGURED', bookings: this.getBookings() };
+        }
+
+        const client = SummitSupabase.getSupabase();
+        if (!client) {
+          return { success: false, reason: 'SUPABASE_NOT_CONFIGURED', bookings: this.getBookings() };
+        }
+
+        const effectiveUserId = userId || (typeof SummitSupabase.getUser === 'function' && SummitSupabase.getUser()?.id) || null;
+        if (!effectiveUserId) {
+          return { success: false, reason: 'NO_USER_ID', bookings: this.getBookings() };
+        }
+
+        const { data, error } = await client
+          .from('bookings')
+          .select('*')
+          .eq('user_id', effectiveUserId);
+
+        if (error) {
+          return { success: false, error: error.message || String(error), bookings: this.getBookings() };
+        }
+
+        const remoteBookings = (data || []).map(row => ({
+          bookingId: row.id,
+          mountainId: row.mountain_id,
+          mountainName: row.mountain_name,
+          basecamp: row.basecamp,
+          climbDate: row.climb_date,
+          durationDays: row.duration_days,
+          leader: row.leader || {},
+          membersCount: row.members_count,
+          members: row.members || [],
+          addons: row.addons || {},
+          totalPayment: row.total_payment,
+          status: row.status,
+          mitigationChoice: row.mitigation_choice || null,
+          highRiskWaiverSigned: !!row.high_risk_waiver_signed,
+          rescheduledFrom: row.rescheduled_from || null,
+          refundDetails: row.refund_details || null,
+          createdAt: row.created_at,
+          userId: row.user_id
+        }));
+
+        const localBookings = this.getBookings();
+        const bookingMap = new Map();
+
+        localBookings.forEach(b => {
+          if (b && (b.bookingId || b.id)) {
+            bookingMap.set(b.bookingId || b.id, b);
+          }
+        });
+
+        remoteBookings.forEach(rb => {
+          if (rb && rb.bookingId) {
+            const existing = bookingMap.get(rb.bookingId);
+            bookingMap.set(rb.bookingId, existing ? { ...existing, ...rb } : rb);
+          }
+        });
+
+        const merged = Array.from(bookingMap.values());
+        this.saveBookings(merged);
+
+        return { success: true, bookings: merged };
+      } catch (e) {
+        return { success: false, error: e.message || String(e), bookings: this.getBookings() };
+      }
     },
 
     /**
