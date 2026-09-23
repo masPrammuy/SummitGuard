@@ -456,7 +456,10 @@
         const { data, error } = await client.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: redirectTarget
+            redirectTo: redirectTarget,
+            queryParams: {
+              prompt: 'select_account'
+            }
           }
         });
 
